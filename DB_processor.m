@@ -208,6 +208,37 @@ classdef DB_processor
                 obj = obj.push_to_randDB(i,'Neg_single_DB',Neg_single_DB_rpl);
             end
         end
+        
+        function array_out = delete_0_from_distmat(~,array_in)
+            array_out = array_in;
+            if array_out(1,1) == 0
+                array_out(:,1) = [];
+            end
+        end
+        function cor_mat = get_position_correlation(obj,DB_A,DB_B,DB_C)
+            cor_mat = cell(1,18);
+            for i = 1:18
+                array_A = obj.get_position_array(obj.(DB_A),i);
+                array_B = obj.get_position_array(obj.(DB_B),i);
+                array_C = obj.get_position_array(obj.(DB_C),i);
+                Dist_mat_AB = obj.Get_Dist_2_matrix(array_A,array_B);
+                Dist_mat_AC = obj.Get_Dist_2_matrix(array_A,array_C);
+                Dist_mat_AB = obj.delete_0_from_distmat(Dist_mat_AB);
+                Dist_mat_AC = obj.delete_0_from_distmat(Dist_mat_AC);
+                cor_mat{i} = cat(2,Dist_mat_AB(:,1),Dist_mat_AC(:,1));
+            end
+        end
+        function check_postion_correlation_one(~,cor_mat,i)
+            cor_mat_1 = cor_mat{i};
+            figure;plot(cor_mat_1(:,1),cor_mat_1(:,2),'.');
+            xlabel('Distance to closest signle-AZ synapse');
+            ylabel('Distance to closest multi-AZ synapse');
+        end
+        function check_position_correlation_one_histogram(~,cor_mat,i)
+            cor_mat_1 = cor_mat{i};
+            target_list = cor_mat_1(cor_mat_1(:,1) < 1.5,2);
+            figure;histogram(target_list,40);
+        end
     end
 end
 
