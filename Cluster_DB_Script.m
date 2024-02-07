@@ -40,8 +40,16 @@ DB_B = "Pos_multi_DB";
 cor_mat_rand = DBP.get_position_correlation(DB_A,DB_A,DB_B);
 %%
 DBP.check_postion_correlation_one(cor_mat,1);
+DBP.check_postion_correlation_one(cor_mat_rand,1);
 DBP.check_postion_correlation_one(cor_mat,4);
+DBP.check_postion_correlation_one(cor_mat_rand,4);
 DBP.check_postion_correlation_one(cor_mat,7);
-DBP.check_postion_correlation_one(cor_mat,8);
+DBP.check_postion_correlation_one(cor_mat_rand,7);
+DBP.check_postion_correlation_one(cor_mat,13);
+DBP.check_postion_correlation_one(cor_mat_rand,13);
 DBP.check_position_correlation_one_histogram(cor_mat,4);
 DBP.check_position_correlation_one_histogram(cor_mat_rand,4);
+%%
+[ratios_orig,kept_ratios_orig] = DBP.Batch_modified_close_check('Pos_single_DB','Pos_multi_DB',1.5);
+%%
+[ratios_rand,kept_ratios_rand] = DBP.Batch_modified_close_check('Pos_single_DB_rand','Pos_multi_DB_rand',1.5);

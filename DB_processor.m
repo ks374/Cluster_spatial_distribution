@@ -96,14 +96,8 @@ classdef DB_processor
 
         function ratio = close_check(obj,Matrix_A,Matrix_B,thre)
             count_all = size(Matrix_A,1);
-            Dist_mat = obj.Get_Dist_2_matrix(Matrix_A,Matrix_B);
-            if Dist_mat(1,1) == 0
-                row_id = 2;
-            else
-                row_id = 1;
-            end
-            temp_logical = Dist_mat(:,row_id)<thre;
-            ratio = sum(temp_logical) / count_all;
+            Logical_list = obj.close_check_ID(Matrix_A,Matrix_B,thre);
+            ratio = numel(find(Logical_list)) / count_all;
         end
         function ratios = batch_close_check(obj,indata_A,indata_B,thre)
             ratios = zeros(18,1);
@@ -233,11 +227,37 @@ classdef DB_processor
             figure;plot(cor_mat_1(:,1),cor_mat_1(:,2),'.');
             xlabel('Distance to closest signle-AZ synapse');
             ylabel('Distance to closest multi-AZ synapse');
+            xlim([0,8]);
+            ylim([0,8]);
+            hold on;
+            line([0,8],[1.5,1.5],'Color','r','LineWidth',1);
+            line([1.5,1.5],[0,8],'Color','r','LineWidth',1);
+            hold off;
         end
         function check_position_correlation_one_histogram(~,cor_mat,i)
             cor_mat_1 = cor_mat{i};
             target_list = cor_mat_1(cor_mat_1(:,1) < 1.5,2);
             figure;histogram(target_list,40);
+        end
+
+        function Logical_list = close_check_ID(obj,Matrix_A,Matrix_B,thre)
+            Dist_mat = obj.Get_Dist_2_matrix(Matrix_A,Matrix_B);
+            Dist_mat = obj.delete_0_from_distmat(Dist_mat);
+            Logical_list = Dist_mat(:,1)<thre;
+        end
+        function [ratios,kept_ratios] = Batch_modified_close_check(obj,indata_A,indata_B,thre)
+            ratios = zeros(18,1);
+            kept_ratios = zeros(18,1);
+            for i = 1:18
+                array_A = obj.get_position_array(obj.(indata_A),i);
+                num_orig = size(array_A,1);
+                array_B = obj.get_position_array(obj.(indata_B),i);
+                Logical_list_A = obj.close_check_ID(array_A,array_B,thre);
+                array_A = array_A(~Logical_list_A,:);
+                num_modified = size(array_A,1);
+                kept_ratios(i) = num_modified/num_orig;
+                ratios(i) = obj.close_check(array_A,array_A,thre);
+            end
         end
     end
 end
