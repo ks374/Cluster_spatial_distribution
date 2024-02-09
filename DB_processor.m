@@ -44,11 +44,18 @@ classdef DB_processor
     end
     
     methods
+        %Initialize the class by reading the .csv file from Cluster_DB.m. 
         function obj = DB_processor(infile)
             obj.All_DB = obj.get_indata(infile);
             obj.save_ID = 1;
         end
-        
+        function indata = get_indata(~,infile)
+            opts = detectImportOptions(infile);
+            indata = readtable(infile,opts);
+        end
+
+        %-----------------------------------------------------------------
+        %Following section is used to initialize all DBs. 
         function obj = splitter(obj)
             obj.Pos_DB = obj.All_DB(obj.get_pos(obj.All_DB),:);
             obj.Neg_DB = obj.All_DB(obj.get_neg(obj.All_DB),:);
@@ -56,11 +63,6 @@ classdef DB_processor
             obj.Pos_single_DB = obj.Pos_DB(obj.get_single(obj.Pos_DB),:);
             obj.Neg_multi_DB = obj.Neg_DB(obj.get_multi(obj.Neg_DB),:);
             obj.Neg_single_DB = obj.Neg_DB(obj.get_single(obj.Neg_DB),:);
-        end
-
-        function indata = get_indata(~,infile)
-            opts = detectImportOptions(infile);
-            indata = readtable(infile,opts);
         end
         function out_IDs = get_multi(~,indata)
             out_IDs = indata.('AZ_') > 1;
@@ -75,13 +77,14 @@ classdef DB_processor
             out_IDs = string(cell2mat(indata.('CTB'))) == "Neg";
         end
 
+        %-----------------------------------------------------------------
+        %Utility functions for DB or array processing. 
         function the_array = get_position_array(obj,indata,i)
             %i stands for experiment ID, range 1-18. 
             Cur_name = obj.Sample_name_list{i};
             Cur_ID = string(cell2mat(indata.('Sample'))) == string(Cur_name);
             the_array = table2array(indata(Cur_ID,6:8));
         end
-
         function Dist_mat = Get_Dist_2_matrix(~,Matrix_A,Matrix_B)
             Dist_mat = zeros(size(Matrix_A,1),10);
             for i = 1:size(Matrix_A,1)
@@ -93,21 +96,41 @@ classdef DB_processor
                 Dist_mat(i,:) = dist;
             end
         end
-
-        function ratio = close_check(obj,Matrix_A,Matrix_B,thre)
-            count_all = size(Matrix_A,1);
-            Logical_list = obj.close_check_ID(Matrix_A,Matrix_B,thre);
-            ratio = numel(find(Logical_list)) / count_all;
+        function Dist = Get_Dist_2_matrix_closest(obj,array_A,array_B)
+            Dist_mat = obj.Get_Dist_2_matrix(array_A,array_B);
+            Dist_mat = obj.delete_0_from_distmat(Dist_mat);
+            Dist = Dist_mat(:,1);
         end
-        function ratios = batch_close_check(obj,indata_A,indata_B,thre)
-            ratios = zeros(18,1);
-            for i = 1:18
-                array_A = obj.get_position_array(obj.(indata_A),i);
-                array_B = obj.get_position_array(obj.(indata_B),i);
-                ratios(i) = obj.close_check(array_A,array_B,thre);
+        function array_out = delete_0_from_distmat(~,array_in)
+            array_out = array_in;
+            delete_index = [];
+            for i = 1:size(array_in,1)
+                content_index = find(array_in(i,:));
+                if numel(content_index) == 0
+                    delete_index = cat(1,delete_index,i);
+                else
+                    content_index = content_index(1);
+                    array_out(i,1) = array_in(i,content_index);
+                end
+            end
+            if numel(delete_index) > 0
+                array_out(delete_index,:) = [];
             end
         end
+        function Logical_list = close_check_ID(obj,Matrix_A,Matrix_B,thre)
+            %Get logical ID of cluster As that are close to cluster Bs. 
+            Dist_mat = obj.Get_Dist_2_matrix(Matrix_A,Matrix_B);
+            Dist_mat = obj.delete_0_from_distmat(Dist_mat);
+            Logical_list = Dist_mat(:,1)<thre;
+        end
+        function num = get_curr_sample_pl_length(obj,DB_name,i)
+            Cur_name = obj.Sample_name_list{i};
+            Cur_ID = string(cell2mat(obj.(DB_name).('Sample'))) == string(Cur_name);
+            num = numel(find(Cur_ID));
+        end
 
+        %-----------------------------------------------------------------
+        %Utility function specific to a target dataset. 
         function [num_images,Height,Width] = get_stack_info(obj,i)
             inpath = obj.Image_folder_list{i};
             inpath = [inpath 'analysis\Result\1_soma\'];
@@ -128,6 +151,14 @@ classdef DB_processor
             end
             soma_images = logical(soma_images);
         end
+        function pix_list = get_neuropile_pix_list(~,soma_images)
+            soma_images = ~soma_images;
+            [x,y,z] = ind2sub(size(soma_images),find(soma_images));
+            pix_list = cat(2,x,y,z);
+        end
+
+        %-----------------------------------------------------------------
+        %Utility functions to generate randomized data. 
         function rand_position_list = get_rand_positions(obj,i,num)
             [num_images,Height,Width] = obj.get_stack_info(i);
             image_matrix = [Height,0,0;0,Width,0;0,0,num_images];
@@ -161,11 +192,6 @@ classdef DB_processor
             Cur_ID = string(cell2mat(new_DB.('Sample'))) == string(Cur_name);
             new_DB{Cur_ID,6:8} = rpl;
             obj.(new_DB_name) = new_DB;
-        end
-        function num = get_curr_sample_pl_length(obj,DB_name,i)
-            Cur_name = obj.Sample_name_list{i};
-            Cur_ID = string(cell2mat(obj.(DB_name).('Sample'))) == string(Cur_name);
-            num = numel(find(Cur_ID));
         end
         function obj = rpl_generator(obj,type)
             for i = 1:18
@@ -202,13 +228,74 @@ classdef DB_processor
                 obj = obj.push_to_randDB(i,'Neg_single_DB',Neg_single_DB_rpl);
             end
         end
-        
-        function array_out = delete_0_from_distmat(~,array_in)
-            array_out = array_in;
-            if array_out(1,1) == 0
-                array_out(:,1) = [];
+
+        %-----------------------------------------------------------------
+        %Experiment 1/2. 
+        function ratio = close_check(obj,Matrix_A,Matrix_B,thre)
+            %Ratio of cluster A that are close to cluster B. 
+            count_all = size(Matrix_A,1);
+            Logical_list = obj.close_check_ID(Matrix_A,Matrix_B,thre);
+            ratio = sum(Logical_list) / count_all;
+        end
+        function ratios = batch_close_check(obj,indata_A,indata_B,thre)
+            ratios = zeros(18,1);
+            for i = 1:18
+                array_A = obj.get_position_array(obj.(indata_A),i);
+                array_B = obj.get_position_array(obj.(indata_B),i);
+                ratios(i) = obj.close_check(array_A,array_B,thre);
             end
         end
+
+        %-----------------------------------------------------------------
+        %Experiment 4. 
+        function norm_den = batch_get_norm_syn_density(obj,indata_A)
+            %Read the target area region from XXX.mat files with pix_list
+            %and calculate the indata_A synapse density on that region. 
+            norm_den = zeros(18,1);
+            for i = 1:18
+                array_A = obj.get_position_array(obj.(indata_A),i);
+                soma_images = obj.get_soma_mask(i);
+                norm_den(i) = size(array_A,1) / obj.get_area(soma_images);
+            end
+        end
+        function area = get_area(~,images)
+            images = logical(images);
+            area = sum(images(:)) / 0.0155/0.0155/0.07;
+        end
+        function array_new = pl_refine(obj,array_A,array_B,thre,far_logical)
+            %Refine a list, where only far/close clusters are kept
+            %far_logical=0: keep close; far_logical=1: keep far. 
+            Logical_list = obj.close_check_ID(array_A,array_B,thre);
+            if far_logical == 0
+                array_new = array_A(Logical_list,:);
+            else
+                array_new = array_A(~Logical_list,:);
+            end
+        end
+        function resampled_array = resampling_once(~,array,sampling_size)
+            %For a given positionlist, resample it at sampling size (integer). 
+            rand_index = randi(size(array,1),[sampling_size,1]);
+            resampled_array = array(rand_index,:);
+        end
+        function sampling_num = get_sampling_size(~,images,norm_den)
+            %For a given neuropil size and target normalized density, give
+            %how many clusters should be found. 
+            temp = logical(images);
+            sampling_num = ceil(sum(temp(:))*0.0155*0.0155*0.07*norm_den);
+        end
+        function [ratio,stdev] = resampled_close_check(obj,array_A,array_B,resampling_size,resampling_times,thre)
+            ratios = zeros(resampling_times,1);
+            parfor i = 1:resampling_times
+                resampled_array = obj.resampling_once(array_B,resampling_size);
+                ratios(i) = obj.close_check(array_A,resampled_array,thre); 
+            end
+            ratio = mean(ratios);
+            stdev = std(ratios);
+        end
+        
+        
+        %-----------------------------------------------------------------
+        %WIP. 
         function cor_mat = get_position_correlation(obj,DB_A,DB_B,DB_C)
             cor_mat = cell(1,18);
             for i = 1:18
@@ -240,25 +327,9 @@ classdef DB_processor
             figure;histogram(target_list,40);
         end
 
-        function Logical_list = close_check_ID(obj,Matrix_A,Matrix_B,thre)
-            Dist_mat = obj.Get_Dist_2_matrix(Matrix_A,Matrix_B);
-            Dist_mat = obj.delete_0_from_distmat(Dist_mat);
-            Logical_list = Dist_mat(:,1)<thre;
-        end
-        function [ratios,kept_ratios] = Batch_modified_close_check(obj,indata_A,indata_B,thre)
-            ratios = zeros(18,1);
-            kept_ratios = zeros(18,1);
-            for i = 1:18
-                array_A = obj.get_position_array(obj.(indata_A),i);
-                num_orig = size(array_A,1);
-                array_B = obj.get_position_array(obj.(indata_B),i);
-                Logical_list_A = obj.close_check_ID(array_A,array_B,thre);
-                array_A = array_A(~Logical_list_A,:);
-                num_modified = size(array_A,1);
-                kept_ratios(i) = num_modified/num_orig;
-                ratios(i) = obj.close_check(array_A,array_A,thre);
-            end
-        end
+        
+        
+        
     end
 end
 

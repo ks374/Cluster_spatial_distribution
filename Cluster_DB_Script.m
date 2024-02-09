@@ -51,5 +51,39 @@ DBP.check_position_correlation_one_histogram(cor_mat,4);
 DBP.check_position_correlation_one_histogram(cor_mat_rand,4);
 %%
 [ratios_orig,kept_ratios_orig] = DBP.Batch_modified_close_check('Pos_single_DB','Pos_multi_DB',1.5);
-%%
 [ratios_rand,kept_ratios_rand] = DBP.Batch_modified_close_check('Pos_single_DB_rand','Pos_multi_DB_rand',1.5);
+%%
+save('Y:\Chenghang\4_Color_Continue\Database\DBP.mat','DBP');
+%%
+%Experiment 4.1: 
+norm_den = DBP.batch_get_norm_syn_density('Neg_multi_DB');
+disp(norm_den);
+%%
+%Experiment 4.2: 
+%Check the best resampling time: 
+%Pos_single_DB: 
+
+norm_den = 0.03; %Not sure
+resampling_times = 100;
+thre = 1.5;
+far_logical = 1;
+indata_A = 'Pos_single_DB';
+indata_B = 'Pos_multi_DB';
+%for i = 1:18
+i = 4;
+    soma_images = DBP.get_soma_mask(i);
+    resampling_size = DBP.get_sampling_size(~soma_images,norm_den);
+    array_A = DBP.get_position_array(DBP.(indata_A),i);
+    array_B = DBP.get_position_array(DBP.(indata_B),i);
+    array_new = DBP.pl_refine(array_A,array_B,thre,far_logical);
+    [ratio,ratio_std] = DBP.resampled_close_check(array_new,array_new,resampling_size,resampling_times,thre);
+%end
+disp(ratio);
+disp(ratio_std);
+
+%%
+%Experiment 4.2: 
+sampling_size = 100;
+for i = 1:18
+
+end
