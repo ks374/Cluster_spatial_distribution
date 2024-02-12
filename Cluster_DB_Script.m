@@ -60,30 +60,54 @@ norm_den = DBP.batch_get_norm_syn_density('Neg_multi_DB');
 disp(norm_den);
 %%
 %Experiment 4.2: 
-%Check the best resampling time: 
+%Type 1 calculation, the best resampling norm_den is set as 0.03. 
+%Resampling_times = 100. 
 %Pos_single_DB: 
-
-norm_den = 0.03; %Not sure
+norm_den = 0.03;
 resampling_times = 100;
 thre = 1.5;
 far_logical = 1;
 indata_A = 'Pos_single_DB';
 indata_B = 'Pos_multi_DB';
-%for i = 1:18
-i = 4;
-    soma_images = DBP.get_soma_mask(i);
-    resampling_size = DBP.get_sampling_size(~soma_images,norm_den);
-    array_A = DBP.get_position_array(DBP.(indata_A),i);
-    array_B = DBP.get_position_array(DBP.(indata_B),i);
-    array_new = DBP.pl_refine(array_A,array_B,thre,far_logical);
-    [ratio,ratio_std] = DBP.resampled_close_check(array_new,array_new,resampling_size,resampling_times,thre);
-%end
-disp(ratio);
-disp(ratio_std);
-
+[ratios,ratios_std] = DBP.batch_experiment_4_3(norm_den,resampling_times,thre,far_logical,indata_A,indata_B);
+disp(ratios);
+disp(ratios_std);
 %%
-%Experiment 4.2: 
-sampling_size = 100;
-for i = 1:18
-
-end
+indata_A = 'Neg_single_DB';
+indata_B = 'Neg_multi_DB';
+[ratios,ratios_std] = DBP.batch_experiment_4_3(norm_den,resampling_times,thre,far_logical,indata_A,indata_B);
+disp(ratios);
+disp(ratios_std);
+%%
+%Type 1 randomization. 
+indata_B = 'Pos_multi_DB';
+[ratios,ratios_std] = DBP.batch_experiment_4_4_rand(norm_den,resampling_times,thre,indata_B);
+disp(ratios);
+disp(ratios_std);
+%%
+%Type 1 randomization. 
+indata_B = 'Neg_multi_DB';
+[ratios,~] = DBP.batch_experiment_4_4_rand(norm_den,resampling_times,thre,indata_B);
+disp(ratios);
+disp(ratios_std);
+%%
+%Type 2 calculation: 
+indata_A = 'Pos_single_DB';
+indata_B = 'Pos_single_DB';
+[ratios,~] = DBP.batch_experiment_4_5(norm_den,resampling_times,thre,indata_A,indata_B);
+disp(ratios);
+%%
+indata_A = 'Neg_single_DB';
+indata_B = 'Neg_single_DB';
+[ratios,~] = DBP.batch_experiment_4_5(norm_den,resampling_times,thre,indata_A,indata_B);
+disp(ratios);
+%%
+indata_A = 'Pos_single_DB_rand';
+indata_B = 'Pos_single_DB_rand';
+[ratios,~] = DBP.batch_experiment_4_5(norm_den,resampling_times,thre,indata_A,indata_B);
+disp(ratios);
+%%
+indata_A = 'Neg_single_DB_rand';
+indata_B = 'Neg_single_DB_rand';
+[ratios,~] = DBP.batch_experiment_4_5(norm_den,resampling_times,thre,indata_A,indata_B);
+disp(ratios);
