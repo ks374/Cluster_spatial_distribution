@@ -103,18 +103,14 @@ classdef DB_processor
         end
         function array_out = delete_0_from_distmat(~,array_in)
             array_out = array_in;
-            delete_index = [];
             for i = 1:size(array_in,1)
                 content_index = find(array_in(i,:));
                 if numel(content_index) == 0
-                    delete_index = cat(1,delete_index,i);
+                    array_out(i,1) = 999999;
                 else
                     content_index = content_index(1);
                     array_out(i,1) = array_in(i,content_index);
                 end
-            end
-            if numel(delete_index) > 0
-                array_out(delete_index,:) = [];
             end
         end
         function Logical_list = close_check_ID(obj,Matrix_A,Matrix_B,thre)
@@ -228,7 +224,41 @@ classdef DB_processor
                 obj = obj.push_to_randDB(i,'Neg_single_DB',Neg_single_DB_rpl);
             end
         end
-
+        %-----------------------------------------------------------------
+        %Experiment 4minus1, a new strategy for randomization through
+        %rotation. 
+        function array_B = get_4_1_random_list(obj,array_A,i,displacement)
+            %For a given array_A, return it's randomization based on
+            %displacement on the canvas. A 180 degree rotation will always
+            %be done around one axis. 
+            if nargin < 3
+                displacement = [0.5,0.5,0.5];
+            end
+            if nargin == 4
+                if numel(displacement)~=3
+                    error('Displacement parameter should contain 3 values ranging 0~1');
+                end
+            end
+            [num_images,Height,Width] = obj.get_stack_info(obj,i);
+            H_disp = Height*displacement(1);
+            W_disp = Width*displacement(2);
+            N_disp = num_images * displacement(3);
+            array_A(:,1) = array_A(:,1) + H_disp;
+            array_A(array_A(:,1) > Height,1) = array_A(array_A(:,1) > Height,1) - H_disp;
+            array_A(:,2) = array_A(:,2) + W_disp;
+            array_A(array_A(:,2) > Width,1) = array_A(array_A(:,2) > Width,1) - W_disp;
+            array_A(:,3) = array_A(:,3) + N_disp;
+            array_A(array_A(:,3) > num_images,1) = array_A(array_A(:,3) > num_images,1) - N_disp;
+            rot_mat = [1,0,0;0,-1,0;0,0,-1];
+            array_A = array_A';
+            array_A(2,:) = array_A(2,:) - Width/2;
+            array_A(3,:) = array_A(3,:) - num_images/2;
+            array_B = rot_mat * array_A;
+            array_B(2,:) = array_B(2,:) + Width/2;
+            array_B(3,:) = array_B(3,:) + num_images/2;
+            array_B = array_B';
+            %Need validation. 
+        end
         %-----------------------------------------------------------------
         %Experiment 1/2. 
         function ratio = close_check(obj,Matrix_A,Matrix_B,thre)
@@ -324,7 +354,6 @@ classdef DB_processor
             for i = 1:18
                 [num_images,Height,Width] = obj.get_stack_info(i);
                 soma_images = obj.get_soma_mask(i);
-                resampling_size = obj.get_sampling_size(~soma_images,norm_den);
                 target_close_region = zeros(size(soma_images));
                 array_B = obj.get_position_array(obj.(indata_B),i);
                 array_B = ceil(array_B);
@@ -335,6 +364,7 @@ classdef DB_processor
                     target_close_region(:,:,j) = bwdist(logical(target_close_region(:,:,j))) < (1500/15.5);
                 end
                 target_region = target_close_region | soma_images;
+                resampling_size = obj.get_sampling_size(~target_region,norm_den);
                 array_A = zeros(resampling_size,3);
                 parfor j = 1:resampling_size
                     %disp(j);
@@ -348,6 +378,28 @@ classdef DB_processor
             end
         end
         function [ratios,ratios_std] = batch_experiment_4_5(obj,norm_den,resampling_times,thre,indata_A,indata_B)
+            %Randomization for A and resampling for B. 
+            ratios = zeros(18,1);
+            ratios_std = zeros(18,1);
+            for i = 1:18
+                soma_images = obj.get_soma_mask(i);
+                resampling_size = obj.get_sampling_size(~soma_images,norm_den);
+                array_A = obj.get_position_array(obj.(indata_A),i);
+                array_B = obj.get_position_array(obj.(indata_B),i);
+                array_A = zeros(resampling_size,3);
+                parfor j = 1:resampling_size
+                    %disp(j);
+                    new_pos = ceil(rand(1,3).*[Height,Width,num_images]);
+                    while target_region(new_pos(1),new_pos(2),new_pos(3)) == 1
+                        new_pos = ceil(rand(1,3).*[Height,Width,num_images]);
+                    end
+                    array_A(j,:) = new_pos;
+                end
+                
+                [ratios(i),ratios_std(i)] = obj.resampled_close_check(array_A,array_B,resampling_size,resampling_times,thre);
+            end
+        end
+        function [ratios,ratios_std] = batch_experiment_4_5_rand(obj,norm_den,resampling_times,thre,indata_A,indata_B)
             ratios = zeros(18,1);
             ratios_std = zeros(18,1);
             for i = 1:18
@@ -358,7 +410,6 @@ classdef DB_processor
                 [ratios(i),ratios_std(i)] = obj.resampled_close_check(array_A,array_B,resampling_size,resampling_times,thre);
             end
         end
-
 
         %-----------------------------------------------------------------
         %WIP. 

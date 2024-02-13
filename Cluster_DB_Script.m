@@ -17,7 +17,7 @@ temp_ratios = DBP.batch_close_check(DB_A,DB_B,1.5);
 disp(temp_ratios);
 %%
 DBP = DBP.init_rand_DB();
-DBP = DBP.rpl_generator(1);
+DBP = DBP.rpl_generator(2);
 %%
 DB_A = "Pos_single_DB_rand";
 DB_B = "Pos_single_DB_rand";
@@ -69,15 +69,13 @@ thre = 1.5;
 far_logical = 1;
 indata_A = 'Pos_single_DB';
 indata_B = 'Pos_multi_DB';
-[ratios,ratios_std] = DBP.batch_experiment_4_3(norm_den,resampling_times,thre,far_logical,indata_A,indata_B);
+[ratios,~] = DBP.batch_experiment_4_3(norm_den,resampling_times,thre,far_logical,indata_A,indata_B);
 disp(ratios);
-disp(ratios_std);
 %%
 indata_A = 'Neg_single_DB';
 indata_B = 'Neg_multi_DB';
 [ratios,ratios_std] = DBP.batch_experiment_4_3(norm_den,resampling_times,thre,far_logical,indata_A,indata_B);
 disp(ratios);
-disp(ratios_std);
 %%
 %Type 1 randomization. 
 indata_B = 'Pos_multi_DB';
@@ -103,7 +101,7 @@ indata_B = 'Neg_single_DB';
 disp(ratios);
 %%
 indata_A = 'Pos_single_DB_rand';
-indata_B = 'Pos_single_DB_rand';
+indata_B = 'Pos_single_DB';
 [ratios,~] = DBP.batch_experiment_4_5(norm_den,resampling_times,thre,indata_A,indata_B);
 disp(ratios);
 %%
@@ -111,3 +109,67 @@ indata_A = 'Neg_single_DB_rand';
 indata_B = 'Neg_single_DB_rand';
 [ratios,~] = DBP.batch_experiment_4_5(norm_den,resampling_times,thre,indata_A,indata_B);
 disp(ratios);
+%%
+%Type 3 calculation. 
+ratios = zeros(18,4);
+thre = 1.5;
+indata_A = 'Pos_single_DB';
+indata_B = 'Pos_multi_DB';
+[ratios(:,1),~] = DBP.batch_experiment_4_5(norm_den,resampling_times,thre,indata_A,indata_B);
+indata_A = 'Pos_single_DB_rand';
+indata_B = 'Pos_multi_DB_rand';
+[ratios(:,2),~] = DBP.batch_experiment_4_5(norm_den,resampling_times,thre,indata_A,indata_B);
+indata_A = 'Neg_single_DB';
+indata_B = 'Neg_multi_DB';
+[ratios(:,3),~] = DBP.batch_experiment_4_5(norm_den,resampling_times,thre,indata_A,indata_B);
+indata_A = 'Neg_single_DB_rand';
+indata_B = 'Neg_multi_DB_rand';
+[ratios(:,4),~] = DBP.batch_experiment_4_5(norm_den,resampling_times,thre,indata_A,indata_B);
+disp('Pos-pos');
+disp(ratios(:,1));
+disp('Pos_pos_rand');
+disp(ratios(:,2));
+disp('Neg_neg');
+disp(ratios(:,3));
+disp('Neg_neg_rand');
+disp(ratios(:,4));
+%%
+%Type 4 troubleshooting 2
+ratios = zeros(18,2);
+norm_den = 0.003;
+indata_A = 'Neg_single_DB';
+indata_B = 'Neg_multi_DB';
+[ratios(:,1),~] = DBP.batch_experiment_4_5(norm_den,resampling_times,thre,indata_A,indata_B);
+indata_A = 'Neg_single_DB_rand';
+indata_B = 'Neg_multi_DB';
+[ratios(:,2),~] = DBP.batch_experiment_4_5(norm_den,resampling_times,thre,indata_A,indata_B);
+disp('Neg_neg');
+disp(ratios(:,1));
+disp('Neg_neg_rand');
+disp(ratios(:,2));
+%%
+ratios = zeros(18,2);
+norm_den = 0.003;
+indata_A = 'Neg_single_DB';
+indata_B = 'Neg_single_DB';
+[ratios(:,1),~] = DBP.batch_experiment_4_5(norm_den,resampling_times,thre,indata_A,indata_B);
+indata_A = 'Neg_single_DB_rand';
+indata_B = 'Neg_single_DB';
+[ratios(:,2),~] = DBP.batch_experiment_4_5(norm_den,resampling_times,thre,indata_A,indata_B);
+disp('Neg_neg');
+disp(ratios(:,1));
+disp('Neg_neg_rand');
+disp(ratios(:,2));
+%%
+ratios = zeros(18,2);
+norm_den = 0.003;
+indata_A = 'Neg_single_DB_rand';
+indata_B = 'Neg_single_DB_rand';
+[ratios(:,1),~] = DBP.batch_experiment_4_5(norm_den,resampling_times,thre,indata_A,indata_B);
+indata_A = 'Neg_single_DB_rand';
+indata_B = 'Neg_multi_DB_rand';
+[ratios(:,2),~] = DBP.batch_experiment_4_5(norm_den,resampling_times,thre,indata_A,indata_B);
+disp('half_rand');
+disp(ratios(:,1));
+disp('total_rand');
+disp(ratios(:,2));
