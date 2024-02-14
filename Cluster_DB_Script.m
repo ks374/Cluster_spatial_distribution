@@ -4,6 +4,10 @@ DBfile = 'Y:\Chenghang\4_Color_Continue\Database\DB_all.csv';
 CDB = Cluster_DB(inpath);
 CDB.Write_basic_DB(DBfile);
 %%
+inpath = 'Y:\Chenghang\4_Color_Continue\Raw\';
+CDB = Cluster_DB(inpath);
+CDB.get_typical_linear_size();
+%%
 DBP = DB_processor(outfile);
 DBP = DBP.splitter();
 %%
@@ -63,13 +67,15 @@ disp(norm_den);
 %Type 1 calculation, the best resampling norm_den is set as 0.03. 
 %Resampling_times = 100. 
 %Pos_single_DB: 
-norm_den = 0.03;
-resampling_times = 100;
+norm_den_A = 0.03;
+norm_den_B = 0.01;
+resampling_times = 200;
 thre = 1.5;
 far_logical = 1;
 indata_A = 'Pos_single_DB';
 indata_B = 'Pos_multi_DB';
-[ratios,~] = DBP.batch_experiment_4_3(norm_den,resampling_times,thre,far_logical,indata_A,indata_B);
+[ratios,~] = DBP.batch_experiment_4_3(norm_den_A,norm_den_B,...
+    resampling_times,thre,far_logical,indata_A,indata_B);
 disp(ratios);
 %%
 indata_A = 'Neg_single_DB';
@@ -173,3 +179,6 @@ disp('half_rand');
 disp(ratios(:,1));
 disp('total_rand');
 disp(ratios(:,2));
+%%
+%Experiment 4minus1, new randomization DB: 
+DBP = DBP.batch_experiment4minus1_randomization(displacement);

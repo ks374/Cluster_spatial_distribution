@@ -55,6 +55,43 @@ classdef Cluster_DB
                 end
             end
         end
+
+        function get_typical_linear_size(obj)
+            %Write AZ number and WC of each cluster. 
+            multi_AZ = [];
+            single_AZ = [];
+            for i = 1:18
+                disp(obj.Sample_name_list{i});
+                load([obj.Inpath,'Vwater_ss_',sprintf('%03d',i),'.mat']);
+                load([obj.Inpath,'Vwater_sn_',sprintf('%03d',i),'.mat']);
+                for j = 1:numel(statsVwater_ss)
+                    AZ_number = statsVwater_ss(j).B_ID;
+                    AZ_number = numel(AZ_number) - 1;
+                    if AZ_number < 1
+                        AZ_number = 1;
+                    end
+                    if AZ_number == 1
+                        single_AZ = cat(1,single_AZ,statsVwater_ss(j).Volume2_0);
+                    else
+                        multi_AZ = cat(1,multi_AZ,statsVwater_ss(j).Volume2_0);
+                    end
+                end
+                for j = 1:numel(statsVwater_sn)
+                    AZ_number = statsVwater_sn(j).B_ID;
+                    AZ_number = numel(AZ_number) - 1;
+                    if AZ_number < 1
+                        AZ_number = 1;
+                    end
+                    if AZ_number == 1
+                        single_AZ = cat(1,single_AZ,statsVwater_sn(j).Volume2_0);
+                    else
+                        multi_AZ = cat(1,multi_AZ,statsVwater_sn(j).Volume2_0);
+                    end
+                end
+            end
+            disp(['Multi_AZ linear size:' num2str(nthroot((median(multi_AZ)*0.0155*0.0155*0.07),3))]);
+            disp(['Single_AZ linear size:' num2str(nthroot((median(single_AZ)*0.0155*0.0155*0.07),3))]);
+        end
     end
 end
 

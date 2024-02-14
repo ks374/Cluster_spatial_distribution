@@ -40,20 +40,19 @@ classdef DB_processor
             'Y:\Chenghang\4_Color\Raw\1.13.2021_B2P8B_B\',...
             'Y:\Chenghang\4_Color\Raw\1.11.2021_B2P8C_B\'
             };
-        save_ID int16; %To save .mat files for experiments. 
+        typical_linear_size double; %To save .mat files for experiments. 
     end
     
     methods
         %Initialize the class by reading the .csv file from Cluster_DB.m. 
         function obj = DB_processor(infile)
             obj.All_DB = obj.get_indata(infile);
-            obj.save_ID = 1;
+            obj.typical_linear_size = [0.3379,0.22508] / 2;
         end
         function indata = get_indata(~,infile)
             opts = detectImportOptions(infile);
             indata = readtable(infile,opts);
         end
-
         %-----------------------------------------------------------------
         %Following section is used to initialize all DBs. 
         function obj = splitter(obj)
@@ -231,7 +230,7 @@ classdef DB_processor
             %For a given array_A, return it's randomization based on
             %displacement on the canvas. A 180 degree rotation will always
             %be done around one axis. 
-            if nargin < 3
+            if nargin == 3
                 displacement = [0.5,0.5,0.5];
             end
             if nargin == 4
@@ -239,25 +238,52 @@ classdef DB_processor
                     error('Displacement parameter should contain 3 values ranging 0~1');
                 end
             end
-            [num_images,Height,Width] = obj.get_stack_info(obj,i);
+            [num_images,Height,Width] = obj.get_stack_info(i);
             H_disp = Height*displacement(1);
             W_disp = Width*displacement(2);
             N_disp = num_images * displacement(3);
             array_A(:,1) = array_A(:,1) + H_disp;
-            array_A(array_A(:,1) > Height,1) = array_A(array_A(:,1) > Height,1) - H_disp;
+            array_A(array_A(:,1) > Height,1) = array_A(array_A(:,1) > Height,1) - Height;
             array_A(:,2) = array_A(:,2) + W_disp;
-            array_A(array_A(:,2) > Width,1) = array_A(array_A(:,2) > Width,1) - W_disp;
+            array_A(array_A(:,2) > Width,2) = array_A(array_A(:,2) > Width,2) - Width;
             array_A(:,3) = array_A(:,3) + N_disp;
-            array_A(array_A(:,3) > num_images,1) = array_A(array_A(:,3) > num_images,1) - N_disp;
+            array_A(array_A(:,3) > num_images,3) = array_A(array_A(:,3) > num_images,3) - num_images;
             rot_mat = [1,0,0;0,-1,0;0,0,-1];
             array_A = array_A';
-            array_A(2,:) = array_A(2,:) - Width/2;
-            array_A(3,:) = array_A(3,:) - num_images/2;
+            array_A(2,:) = array_A(2,:) - Width/2 - 0.5;
+            array_A(3,:) = array_A(3,:) - num_images/2 + 0.5;
             array_B = rot_mat * array_A;
-            array_B(2,:) = array_B(2,:) + Width/2;
-            array_B(3,:) = array_B(3,:) + num_images/2;
+            array_B(2,:) = array_B(2,:) + Width/2 - 0.5;
+            array_B(3,:) = array_B(3,:) + num_images/2 + 0.5;
             array_B = array_B';
-            %Need validation. 
+        end
+        function obj = batch_experiment4minus1_randomization(obj,displacement)
+            if nargin == 1
+                displacement = [0.5,0.5,0.5];
+            end
+            for i = 1:18
+                array_A = obj.get_position_array(obj.('All_DB'),i);
+                rand_B = obj.get_4_1_random_list(array_A,i,displacement);
+                obj = obj.push_to_randDB(i,'All_DB',rand_B);
+                array_A = obj.get_position_array(obj.('Pos_DB'),i);
+                rand_B = obj.get_4_1_random_list(array_A,i,displacement);
+                obj = obj.push_to_randDB(i,'Pos_DB',rand_B);
+                array_A = obj.get_position_array(obj.('Neg_DB'),i);
+                rand_B = obj.get_4_1_random_list(array_A,i,displacement);
+                obj = obj.push_to_randDB(i,'Neg_DB',rand_B);
+                array_A = obj.get_position_array(obj.('Pos_multi_DB'),i);
+                rand_B = obj.get_4_1_random_list(array_A,i,displacement);
+                obj = obj.push_to_randDB(i,'Pos_multi_DB',rand_B);
+                array_A = obj.get_position_array(obj.('Pos_single_DB'),i);
+                rand_B = obj.get_4_1_random_list(array_A,i,displacement);
+                obj = obj.push_to_randDB(i,'Pos_single_DB',rand_B);
+                array_A = obj.get_position_array(obj.('Neg_multi_DB'),i);
+                rand_B = obj.get_4_1_random_list(array_A,i,displacement);
+                obj = obj.push_to_randDB(i,'Neg_multi_DB',rand_B);
+                array_A = obj.get_position_array(obj.('Neg_single_DB'),i);
+                rand_B = obj.get_4_1_random_list(array_A,i,displacement);
+                obj = obj.push_to_randDB(i,'Neg_single_DB',rand_B);
+            end
         end
         %-----------------------------------------------------------------
         %Experiment 1/2. 
@@ -313,25 +339,29 @@ classdef DB_processor
             temp = logical(images);
             sampling_num = ceil(sum(temp(:))*0.0155*0.0155*0.07*norm_den);
         end
-        function [ratio,stdev] = resampled_close_check(obj,array_A,array_B,resampling_size,resampling_times,thre)
+        function [ratio,stdev] = resampled_close_check(obj,array_A,array_B,resampling_size_A,resampling_size_B,resampling_times,thre)
             ratios = zeros(resampling_times,1);
             parfor i = 1:resampling_times
-                resampled_array = obj.resampling_once(array_B,resampling_size);
-                ratios(i) = obj.close_check(array_A,resampled_array,thre); 
+                resampled_array_A = obj.resampling_once(array_A,resampling_size_A);
+                resampled_array_B = obj.resampling_once(array_B,resampling_size_B);
+                ratios(i) = obj.close_check(resampled_array_A,resampled_array_B,thre); 
             end
             ratio = mean(ratios);
             stdev = std(ratios);
         end
-        function [ratios,ratios_std] = batch_experiment_4_3(obj,norm_den,resampling_times,thre,far_logical,indata_A,indata_B)
+        function [ratios,ratios_std] = batch_experiment_4_3(obj,norm_den_A,norm_den_B,resampling_times,thre,far_logical,indata_A,indata_B)
             ratios = zeros(18,1);
             ratios_std = zeros(18,1);
             for i = 1:18
                 soma_images = obj.get_soma_mask(i);
-                resampling_size = obj.get_sampling_size(~soma_images,norm_den);
+                resampling_size_A = obj.get_sampling_size(~soma_images,norm_den_A);
+                resampling_size_B = obj.get_sampling_size(~soma_images,norm_den_B);
                 array_A = obj.get_position_array(obj.(indata_A),i);
                 array_B = obj.get_position_array(obj.(indata_B),i);
                 array_new = obj.pl_refine(array_A,array_B,thre,far_logical);
-                [ratios(i),ratios_std(i)] = obj.resampled_close_check(array_new,array_new,resampling_size,resampling_times,thre);
+                [ratios(i),ratios_std(i)] = obj.resampled_close_check(...
+                    array_new,array_new,resampling_size_A,resampling_size_B,...
+                    resampling_times,thre-obj.typical_linear_size(2));
             end
         end
         function [ratios,ratios_std] = batch_experiment_4_4(obj,norm_den,resampling_times,thre,far_logical,indata_A,indata_B)
