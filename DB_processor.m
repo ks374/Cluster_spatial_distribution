@@ -349,7 +349,7 @@ classdef DB_processor
             ratio = mean(ratios);
             stdev = std(ratios);
         end
-        function [ratios,ratios_std] = batch_experiment_4_3(obj,norm_den_A,norm_den_B,resampling_times,thre,far_logical,indata_A,indata_B)
+        function [ratios,ratios_std] = batch_experiment_4_2(obj,norm_den_A,norm_den_B,resampling_times,thre,far_logical,indata_A,indata_B)
             ratios = zeros(18,1);
             ratios_std = zeros(18,1);
             for i = 1:18
@@ -358,86 +358,28 @@ classdef DB_processor
                 resampling_size_B = obj.get_sampling_size(~soma_images,norm_den_B);
                 array_A = obj.get_position_array(obj.(indata_A),i);
                 array_B = obj.get_position_array(obj.(indata_B),i);
-                array_new = obj.pl_refine(array_A,array_B,thre,far_logical);
+                array_new = obj.pl_refine(array_A,array_B,thre+obj.typical_linear_size(2),far_logical);
+                indata_C = [indata_A '_rand'];
+                array_C = obj.get_position_array(obj.(indata_C),i);
                 [ratios(i),ratios_std(i)] = obj.resampled_close_check(...
-                    array_new,array_new,resampling_size_A,resampling_size_B,...
-                    resampling_times,thre-obj.typical_linear_size(2));
+                    array_C,array_new,resampling_size_A,resampling_size_B,...
+                    resampling_times,thre+obj.typical_linear_size(2));
             end
         end
-        function [ratios,ratios_std] = batch_experiment_4_4(obj,norm_den,resampling_times,thre,far_logical,indata_A,indata_B)
-            %Similar as experiment 4.3 but with randomization. 
-            ratios = zeros(18,1);
-            ratios_std = zeros(18,1);
-            for i = 1:18
-                soma_images = obj.get_soma_mask(i);
-                resampling_size = obj.get_sampling_size(~soma_images,norm_den);
-                array_A = obj.get_position_array(obj.(indata_A),i);
-                array_B = obj.get_position_array(obj.(indata_B),i);
-                array_new = obj.pl_refine(array_A,array_B,thre,far_logical);
-                [ratios(i),ratios_std(i)] = obj.resampled_close_check(array_new,array_new,resampling_size,resampling_times,thre);
-            end
-        end
-        function [ratios,ratios_std] = batch_experiment_4_4_rand(obj,norm_den,resampling_times,thre,indata_B)
-            %Similar as experiment 4.3 but with randomization. 
-            ratios = zeros(18,1);
-            ratios_std = zeros(18,1);
-            for i = 1:18
-                [num_images,Height,Width] = obj.get_stack_info(i);
-                soma_images = obj.get_soma_mask(i);
-                target_close_region = zeros(size(soma_images));
-                array_B = obj.get_position_array(obj.(indata_B),i);
-                array_B = ceil(array_B);
-                for j = 1:size(array_B,1)
-                    target_close_region(array_B(j,1),array_B(j,2),array_B(j,3)) = 1;
-                end
-                for j = 1:size(soma_images,3)
-                    target_close_region(:,:,j) = bwdist(logical(target_close_region(:,:,j))) < (1500/15.5);
-                end
-                target_region = target_close_region | soma_images;
-                resampling_size = obj.get_sampling_size(~target_region,norm_den);
-                array_A = zeros(resampling_size,3);
-                parfor j = 1:resampling_size
-                    %disp(j);
-                    new_pos = ceil(rand(1,3).*[Height,Width,num_images]);
-                    while target_region(new_pos(1),new_pos(2),new_pos(3)) == 1
-                        new_pos = ceil(rand(1,3).*[Height,Width,num_images]);
-                    end
-                    array_A(j,:) = new_pos;
-                end
-                [ratios(i),ratios_std(i)] = obj.resampled_close_check(array_A,array_A,resampling_size,resampling_times,thre);
-            end
-        end
-        function [ratios,ratios_std] = batch_experiment_4_5(obj,norm_den,resampling_times,thre,indata_A,indata_B)
+        
+        function [ratios,ratios_std] = batch_experiment_4_3(obj,norm_den_A,norm_den_B,resampling_times,thre,indata_A,indata_B)
             %Randomization for A and resampling for B. 
             ratios = zeros(18,1);
             ratios_std = zeros(18,1);
             for i = 1:18
                 soma_images = obj.get_soma_mask(i);
-                resampling_size = obj.get_sampling_size(~soma_images,norm_den);
+                resampling_size_A = obj.get_sampling_size(~soma_images,norm_den_A);
+                resampling_size_B = obj.get_sampling_size(~soma_images,norm_den_B);
                 array_A = obj.get_position_array(obj.(indata_A),i);
                 array_B = obj.get_position_array(obj.(indata_B),i);
-                array_A = zeros(resampling_size,3);
-                parfor j = 1:resampling_size
-                    %disp(j);
-                    new_pos = ceil(rand(1,3).*[Height,Width,num_images]);
-                    while target_region(new_pos(1),new_pos(2),new_pos(3)) == 1
-                        new_pos = ceil(rand(1,3).*[Height,Width,num_images]);
-                    end
-                    array_A(j,:) = new_pos;
-                end
-                
-                [ratios(i),ratios_std(i)] = obj.resampled_close_check(array_A,array_B,resampling_size,resampling_times,thre);
-            end
-        end
-        function [ratios,ratios_std] = batch_experiment_4_5_rand(obj,norm_den,resampling_times,thre,indata_A,indata_B)
-            ratios = zeros(18,1);
-            ratios_std = zeros(18,1);
-            for i = 1:18
-                soma_images = obj.get_soma_mask(i);
-                resampling_size = obj.get_sampling_size(~soma_images,norm_den);
-                array_A = obj.get_position_array(obj.(indata_A),i);
-                array_B = obj.get_position_array(obj.(indata_B),i);
-                [ratios(i),ratios_std(i)] = obj.resampled_close_check(array_A,array_B,resampling_size,resampling_times,thre);
+                [ratios(i),ratios_std(i)] = obj.resampled_close_check(array_A,...
+                    array_B,resampling_size_A,resampling_size_B,...
+                    resampling_times,thre);
             end
         end
 
