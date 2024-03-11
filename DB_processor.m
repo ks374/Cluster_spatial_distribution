@@ -304,12 +304,10 @@ classdef DB_processor
         function ratios = batch_close_check_rand(~,DBP_rand,indata_A,indata_B,thre)
             rand_size = numel(DBP_rand);
             ratios = zeros(18,rand_size);
-            for i = 1:18
-                for j = 1:rand_size
-                    cur = DBP_rand(j);
-                    cur_ratio = cur.batch_close_check(indata_A,indata_B,thre);
-                    ratios(:,j) = cur_ratio;
-                end
+            parfor i = 1:rand_size
+                cur = DBP_rand(i);
+                cur_ratio = cur.batch_close_check(indata_A,indata_B,thre);
+                ratios(:,i) = cur_ratio;
             end
             ratios = mean(ratios,2);
         end
