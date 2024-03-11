@@ -1,5 +1,7 @@
+%For Investigation
 clear;clc;
 inpath = 'Y:\Chenghang\4_Color_Continue\Raw\';
+%%
 DBfile = 'Y:\Chenghang\4_Color_Continue\Database\DB_all.csv';
 CDB = Cluster_DB(inpath);
 CDB.Write_basic_DB(DBfile);
@@ -8,6 +10,7 @@ inpath = 'Y:\Chenghang\4_Color_Continue\Raw\';
 CDB = Cluster_DB(inpath);
 CDB.get_typical_linear_size();
 %%
+outfile = 'Y:\Chenghang\4_Color_Continue\Database\DB_all.csv';
 DBP = DB_processor(outfile);
 DBP = DBP.splitter();
 %%

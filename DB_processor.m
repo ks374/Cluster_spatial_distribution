@@ -125,7 +125,7 @@ classdef DB_processor
         end
 
         %-----------------------------------------------------------------
-        %Utility function specific to a target dataset. 
+        %Utility function specific to a target image set. 
         function [num_images,Height,Width] = get_stack_info(obj,i)
             inpath = obj.Image_folder_list{i};
             inpath = [inpath 'analysis\Result\1_soma\'];
@@ -223,7 +223,7 @@ classdef DB_processor
                 obj = obj.push_to_randDB(i,'Neg_single_DB',Neg_single_DB_rpl);
             end
         end
-        %-----------------------------------------------------------------
+
         %Experiment 4minus1, a new strategy for randomization through
         %rotation. 
         function array_B = get_4_1_random_list(obj,array_A,i,displacement)
@@ -300,6 +300,18 @@ classdef DB_processor
                 array_B = obj.get_position_array(obj.(indata_B),i);
                 ratios(i) = obj.close_check(array_A,array_B,thre);
             end
+        end
+        function ratios = batch_close_check_rand(~,DBP_rand,indata_A,indata_B,thre)
+            rand_size = numel(DBP_rand);
+            ratios = zeros(18,rand_size);
+            for i = 1:18
+                for j = 1:rand_size
+                    cur = DBP_rand(j);
+                    cur_ratio = cur.batch_close_check(indata_A,indata_B,thre);
+                    ratios(:,j) = cur_ratio;
+                end
+            end
+            ratios = mean(ratios,2);
         end
 
         %-----------------------------------------------------------------
