@@ -27,3 +27,9 @@ disp(DBP.batch_close_check(DB_A,DB_B,1.5));
 DB_A = "Neg_single_DB";
 DB_B = "Neg_single_DB_rand";
 disp(DBP.batch_close_check_rand(DBP_rand,DB_A,DB_B,1.5));
+%%
+%Experiment 2a
+outpath_2a = 'Y:\Chenghang\4_Color_Continue\Database\Experiment_2.1\';
+n=10;
+DBP.batch_rpl_generater_and_save(outpath_2a,n);
+%%

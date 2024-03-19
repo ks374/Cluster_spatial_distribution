@@ -223,6 +223,15 @@ classdef DB_processor
                 obj = obj.push_to_randDB(i,'Neg_single_DB',Neg_single_DB_rpl);
             end
         end
+        function batch_rpl_generater_and_save(obj,outpath,n)
+            for i = 1:n
+                DBP = obj.rpl_generator(2);
+                save([outpath 'DBP_' sprintf('%03d',i) '.mat'],'DBP');
+            end
+        end
+        function DBP_rand_reader(~,outpath,n)
+            load([outpath 'DBP_' sprintf('%03d',n) '.mat'],'DBP');
+        end
 
         %Experiment 4minus1, a new strategy for randomization through
         %rotation. 
