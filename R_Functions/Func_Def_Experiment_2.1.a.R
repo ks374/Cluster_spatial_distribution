@@ -116,3 +116,24 @@ get_figure_norm_clustering_effect <- function (df,outpath,yrange=c(0,16.0)){
   ggsave(path = outpath,filename=paste(name_string,".eps",sep=""))
   ggsave(path = outpath,filename=paste(name_string,".png",sep=""))
 }
+Experiment21a_ANOVA_single <- function(df,age){
+  df_P <- df[df$Age == age,]
+  df_P.aov <- aov(Ratio~Type,data=df_P)
+  print(summary(df_P.aov))
+}
+Experiment21a_PairedT_single <- function(df,age){
+  df_P <- df[df$Age == age,]
+  df_P_multi <- df_P[df_P$Type=='multi',]$Ratio
+  df_P_single <- df_P[df_P$Type=='single',]$Ratio
+  df_P.t <- t.test(df_P_multi,df_P_single,alternative='greater',paired=TRUE)
+  print(df_P.t)
+  df_P.t <- t.test(df_P_multi,df_P_single,paired=TRUE)
+  print(df_P.t)
+}
+Experiment21a_batch <- function(df){
+  for (x in 1:3){
+    #Result print order: Age[ANOVA,test_1side,test_2side]
+    Experiment21a_ANOVA_single(df,Age_level[x])
+    Experiment21a_PairedT_single(df,Age_level[x])
+  }
+}

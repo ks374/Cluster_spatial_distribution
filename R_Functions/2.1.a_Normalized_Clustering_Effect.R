@@ -33,8 +33,35 @@ df_pos_B2 <- df_pos[df_pos$Genotype=='B2',]
 df_neg_WT <- df_neg[df_neg$Genotype=='WT',]
 df_neg_B2 <- df_pos[df_neg$Genotype=='B2',]
 
+#Write the datasets
+write.csv(df_pos_WT,paste(outpath,"Pos_WT.csv",sep=""))
+write.csv(df_pos_B2,paste(outpath,"Pos_B2.csv",sep=""))
+write.csv(df_neg_WT,paste(outpath,"Neg_WT.csv",sep=""))
+write.csv(df_neg_B2,paste(outpath,"Neg_B2.csv",sep=""))
+
 #Plot: 
 get_figure_norm_clustering_effect(df_pos_WT,outpath,yrange=c(0,6.0))
 get_figure_norm_clustering_effect(df_pos_B2,outpath,yrange=c(0,6.0))
 get_figure_norm_clustering_effect(df_neg_WT,outpath,yrange=c(0,6.0))
 get_figure_norm_clustering_effect(df_neg_B2,outpath,yrange=c(0,6.0))
+
+#Get statistics: 
+Age_level = c('P2','P4','P8')
+Experiment21a_batch(df_pos_WT)
+Experiment21a_batch(df_pos_B2)
+Experiment21a_batch(df_neg_WT)
+Experiment21a_batch(df_neg_B2)
+
+#A quick plot of the effect size (Eta^2)
+Eta_directory = paste(project_directory,"Data/Experiment_2/1a_Direct_ratio_comp/R_Statistics/",sep="")
+Eta_file = paste(Eta_directory,"Summary.csv",sep="")
+df <- read.csv(Eta_file)
+df$Genotype <- substring(df$No_sample,5,6)
+df_WT <- df[df$Genotype=='WT',]
+ggplot(data=df_WT,aes(x=No_sample,y=Eta.2)) + 
+  geom_bar(stat='identity')
+ggsave(path = Eta_directory,filename='WT_Eta.png')
+df_B2 <- df[df$Genotype=='B2',]
+ggplot(data=df_B2,aes(x=No_sample,y=Eta.2)) + 
+  geom_bar(stat='identity')
+ggsave(path = Eta_directory,filename='B2_Eta.png')
