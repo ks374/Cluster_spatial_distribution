@@ -64,6 +64,7 @@ DBP.ratios_writer(ratios,outfile);
 clc
 outpath = 'Y:\Chenghang\4_Color_Continue\Database\Experiment_2.3\';
 DBP.Exp2_3_rand_generator(outpath,100);
+%%
 load([outpath,'DBP_rand.mat']);
 %
 %Experiment 2.3 data generation. 

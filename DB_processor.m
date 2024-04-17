@@ -228,7 +228,7 @@ classdef DB_processor
             for i = 1:n
                 DBP = obj.rpl_generator(2);
                 DBP_rand = cat(1,DBP_rand,DBP);
-                save([outpath 'DBP_rand.mat'],'DBP_rand');
+                save([outpath 'DBP_rand.mat'],'DBP_rand','-v7.3');
             end
         end
 
@@ -432,7 +432,7 @@ classdef DB_processor
         end
         %-----------------------------------------------------------------
         %Experiment 2.3, shuffle single-AZ, multi-AZ identities. 
-        function [Mat_multi_out,Mat_single_out] = shuffle_identities(obj,Mat_multi,Mat_single)
+        function [Mat_multi_out,Mat_single_out] = shuffle_identities(~,Mat_multi,Mat_single)
             num_multi = size(Mat_multi,1);
             %num_single = size(Mat_single,1);
             Mat_all = cat(1,Mat_multi,Mat_single);
@@ -463,7 +463,7 @@ classdef DB_processor
                 DBP = obj.Exp2_3_rand_generator_for1();
                 DBP_rand = cat(1,DBP_rand,DBP);
             end
-            save([outpath 'DBP_rand.mat'],'DBP_rand');
+            save([outpath 'DBP_rand.mat'],'DBP_rand','-v7.3');
         end
         function ratios = Generate_rand_2_3(obj,indata_A,indata_B,thre)
             ratios = zeros(18,1);
