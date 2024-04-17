@@ -440,30 +440,18 @@ classdef DB_processor
             Mat_multi_out = Mat_all(1:num_multi,:);
             Mat_single_out = Mat_all((num_multi+1):end,:);
         end
-        function DBP_out = Exp2_3_rand_generator_for1(obj)
-            DBP_out = obj;
-            for i = 1:18
-                %Pos_DB:
-                array_A = obj.get_position_array(obj.Pos_multi_DB,i);
-                array_B = obj.get_position_array(obj.Pos_single_DB,i);
-                [array_A,array_B] = obj.shuffle_identities(array_A,array_B);
-                DBP_out = DBP_out.push_to_randDB(i,'Pos_multi_DB',array_A);
-                DBP_out = DBP_out.push_to_randDB(i,'Pos_single_DB',array_B);
-                %Neg_DB:
-                array_A = obj.get_position_array(obj.Neg_multi_DB,i);
-                array_B = obj.get_position_array(obj.Neg_single_DB,i);
-                [array_A,array_B] = obj.shuffle_identities(array_A,array_B);
-                DBP_out = DBP_out.push_to_randDB(i,'Neg_multi_DB',array_A);
-                DBP_out = DBP_out.push_to_randDB(i,'Neg_single_DB',array_B);
-            end
+        function Exp2_3_rand_generator_for1(obj,indata_A,indata_B)
+            for 
+            array_A = obj.get_position_array(obj.(indata_A),i);
+            array_B = obj.get_position_array(obj.(indata_B),i);
         end
         function Exp2_3_rand_generator(obj,outpath,rand_size)
             DBP_rand = [];
-            for i = 1:rand_size
-                DBP = obj.Exp2_3_rand_generator_for1();
+            for i = 1:n
+                DBP = obj.rpl_generator(2);
                 DBP_rand = cat(1,DBP_rand,DBP);
+                save([outpath 'DBP_rand.mat'],'DBP_rand');
             end
-            save([outpath 'DBP_rand.mat'],'DBP_rand');
         end
         function ratios = Generate_rand_2_3(obj,indata_A,indata_B,thre)
             ratios = zeros(18,1);
