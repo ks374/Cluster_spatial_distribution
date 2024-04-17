@@ -40,10 +40,10 @@ write.csv(df_neg_WT,paste(outpath,"Neg_WT.csv",sep=""))
 write.csv(df_neg_B2,paste(outpath,"Neg_B2.csv",sep=""))
 
 #Plot: 
-get_figure_norm_clustering_effect(df_pos_WT,outpath,yrange=c(0,6.0))
-get_figure_norm_clustering_effect(df_pos_B2,outpath,yrange=c(0,6.0))
-get_figure_norm_clustering_effect(df_neg_WT,outpath,yrange=c(0,6.0))
-get_figure_norm_clustering_effect(df_neg_B2,outpath,yrange=c(0,6.0))
+get_figure_norm_clustering_effect(df_pos_WT,outpath,yrange=c(1,6.0))
+get_figure_norm_clustering_effect(df_pos_B2,outpath,yrange=c(1,6.0))
+get_figure_norm_clustering_effect(df_neg_WT,outpath,yrange=c(1,6.0))
+get_figure_norm_clustering_effect(df_neg_B2,outpath,yrange=c(1,6.0))
 
 #Get statistics: 
 Age_level = c('P2','P4','P8')
@@ -59,9 +59,15 @@ df <- read.csv(Eta_file)
 df$Genotype <- substring(df$No_sample,5,6)
 df_WT <- df[df$Genotype=='WT',]
 ggplot(data=df_WT,aes(x=No_sample,y=Eta.2)) + 
-  geom_bar(stat='identity')
+  geom_bar(stat='identity') +
+  coord_cartesian(ylim=c(0,1)) + 
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_classic()
 ggsave(path = Eta_directory,filename='WT_Eta.png')
 df_B2 <- df[df$Genotype=='B2',]
 ggplot(data=df_B2,aes(x=No_sample,y=Eta.2)) + 
-  geom_bar(stat='identity')
+  geom_bar(stat='identity') + 
+  coord_cartesian(ylim=c(0,1)) + 
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_classic()
 ggsave(path = Eta_directory,filename='B2_Eta.png')

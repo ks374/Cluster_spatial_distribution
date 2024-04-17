@@ -20,8 +20,8 @@ get_3_vs_30_plot <- function(df){
     geom_point(data=df_WT,aes(fill=Type),position=position_dodge(width=0.9),size = 2) +
     coord_cartesian(ylim=c(-0.1,0.7)) +
     theme_classic()
-  ggsave(path = outpath,filename="Neg_multi_3vs30_CI.png")
-  ggsave(path = outpath,filename="Neg_multi_3vs30_CI.eps")
+  ggsave(path = outpath,filename="Pos_multi_3vs30_CI.png")
+  ggsave(path = outpath,filename="Pos_multi_3vs30_CI.eps")
 }
 
 #Experiment 2.1.a, 1vs10 plot for each replciate
