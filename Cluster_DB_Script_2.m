@@ -88,3 +88,14 @@ DB_B = "Neg_multi_DB_rand";
 ratios = DBP.batch_close_check_rand(DBP_rand,DB_A,DB_B,1.5);
 ratios = cat(2,ratios_temp,ratios);
 DBP.ratios_writer(ratios,outfile);
+%%
+%Experiment 7, start with DBP_rand with shuffled identities. 
+clc
+outfile = 'Y:\Chenghang\4_Color_Continue\Database\Experiment_7\Data_pos_pos.csv';
+DBP.exp7_get_distances(DBP_rand,outfile,1.5,1,1);
+outfile = 'Y:\Chenghang\4_Color_Continue\Database\Experiment_7\Data_pos_neg.csv';
+DBP.exp7_get_distances(DBP_rand,outfile,1.5,1,0);
+outfile = 'Y:\Chenghang\4_Color_Continue\Database\Experiment_7\Data_neg_pos.csv';
+DBP.exp7_get_distances(DBP_rand,outfile,1.5,0,1);
+outfile = 'Y:\Chenghang\4_Color_Continue\Database\Experiment_7\Data_neg_neg.csv';
+DBP.exp7_get_distances(DBP_rand,outfile,1.5,0,0);

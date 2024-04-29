@@ -85,6 +85,7 @@ classdef DB_processor
             the_array = table2array(indata(Cur_ID,6:8));
         end
         function Dist_mat = Get_Dist_2_matrix(~,Matrix_A,Matrix_B)
+            %Get distance from matrix A to matrix B. 
             Dist_mat = zeros(size(Matrix_A,1),10);
             for i = 1:size(Matrix_A,1)
                 dist = sqrt(((Matrix_B(:,1)-Matrix_A(i,1))*0.0155).^2 +...
@@ -471,6 +472,87 @@ classdef DB_processor
                 array_A = obj.get_position_array(obj.(indata_A),i);
                 array_B = obj.get_position_array(obj.(indata_B),i);
                 ratios(i) = obj.close_check(array_A,array_B,thre);
+            end
+        end
+        %-----------------------------------------------------------------
+        %Experiment 7: 
+        %Most functions here is used for distance measuremnet for Figure 4
+        %in the manuscript. 
+        %Generated randomzied data in:
+        %Y:\Chenghang\4_Color_Continue\Database\Experiment_2.3\DBP_rand_10.mat.
+        function Is_clusterd_list = Is_clustered(obj,i,Is_CTB_pos,thre)
+            %Check whethere there is single-AZ synaspe nearby. Return
+            %whether the multi-AZ list is clustered or isolated. 
+            %Is_CTB_pos = 1 or 0. 
+            if nargin < 4
+                thre = 1.5;
+            end
+            if Is_CTB_pos == 1
+                Multi_DB_name = 'Pos_multi_DB';
+                Single_DB_name = 'Pos_single_DB';
+            elseif Is_CTB_pos == 0
+                Multi_DB_name = 'Neg_multi_DB';
+                Single_DB_name = 'Neg_single_DB';
+            end
+            multi_array = obj.get_position_array(obj.(Multi_DB_name),i);
+            single_array = obj.get_position_array(obj.(Single_DB_name),i);
+            Dist = obj.Get_Dist_2_matrix_closest(multi_array,single_array);
+            Is_clusterd_list = (Dist < thre);
+        end
+        function [Clustered_dist,Isolated_dist] =Get_closest_distance_exp7(obj,i,A_Is_Pos,B_Is_Pos,Is_clustered_list)
+            %Quantify distance from A to B. A has same size as
+            %"Is_clustered_list";
+            if A_Is_Pos == 1
+                Matrix_A = 'Pos_multi_DB';
+            elseif A_Is_Pos == 0
+                Matrix_A = 'Neg_multi_DB';
+            end
+            if B_Is_Pos == 1
+                Matrix_B = 'Pos_multi_DB';
+            elseif B_Is_Pos == 0
+                Matrix_B = 'Neg_multi_DB';
+            end
+            Array_A = obj.get_position_array(obj.(Matrix_A),i);
+            Array_B = obj.get_position_array(obj.(Matrix_B),i);
+            Clustered_list_A = Array_A(Is_clustered_list,:);
+            Isolated_list_A = Array_A(~Is_clustered_list,:);
+            Clustered_dist = obj.Get_Dist_2_matrix_closest(Clustered_list_A,Array_B);
+            Isolated_dist = obj.Get_Dist_2_matrix_closest(Isolated_list_A,Array_B);
+        end
+
+        function exp7_get_distances(~,obj_rand,outfile,thre,A_Is_Pos,B_Is_Pos)
+            %Only randomzied data. Out put pulled from 10 randomizations. 
+            temp_obj = obj_rand(1);
+            Sname_list = string(temp_obj.Sample_name_list)';
+            Sample_name_list_char = char(Sname_list);
+            No_sample_list = string(Sample_name_list_char(:,1:4));
+            Genotype_list = string(Sample_name_list_char(:,1:2));
+            Age_list = string(Sample_name_list_char(:,3:4));
+            Sample_list = string(Sample_name_list_char(:,6));
+            type_1 = "Clustred";
+            type_2 = "Isolated";
+            headline = ["Name","No_sample","Genotype","Age","Sample","Type","Distance"];
+            writematrix(headline,outfile);
+            for i = 1:18
+                Clustered_dist_all = [];
+                Isolated_dist_all = [];
+                for j = 1:10
+                    target_obj = obj_rand(j);
+                    Is_clustered_list = target_obj.Is_clustered(i,A_Is_Pos,thre);
+                    [Clustered_dist,Isolated_dist] = target_obj.Get_closest_distance_exp7(i,A_Is_Pos,B_Is_Pos,Is_clustered_list);
+                    Clustered_dist_all = cat(1,Clustered_dist_all,Clustered_dist);
+                    Isolated_dist_all = cat(1,Isolated_dist_all,Isolated_dist);
+                end
+                Clustered_dist_all = Clustered_dist_all';
+                Isolated_dist_all = Isolated_dist_all';
+                Matrix_to_write_clustered = cat(2,Sname_list(i),No_sample_list(i),...
+                                    Genotype_list(i),Age_list(i),Sample_list(i),type_1,...
+                                    Clustered_dist_all);
+                Matrix_to_write_isolated = cat(2,Sname_list(i),No_sample_list(i),...
+                                    Genotype_list(i),Age_list(i),Sample_list(i),type_2,...
+                                    Isolated_dist_all);
+                writematrix(Matrix_to_write_clustered,outfile,'WriteMode','append');
+                writematrix(Matrix_to_write_isolated,outfile,'WriteMode','append');
             end
         end
         %-----------------------------------------------------------------
