@@ -1,7 +1,7 @@
 library(ggplot2)
 library(readxl)
-library(dplyr)
 library(plyr)
+library(dplyr)
 library(tidyr)
 
 project_directory <- "D:/Research/Projects/Project_17_4_color_continue/"
@@ -16,15 +16,24 @@ infile_pos_pos_origin <- paste(in_directory,"Pos_pos_original.csv",sep="")
 df_shuffle <- read.csv(infile_pos_pos_shuffle)
 df_origin <- read.csv(infile_pos_pos_origin)
 df_origin$trans1 <- df_origin$Near_dist
+df_shuffle$trans1 <- as.numeric(df_shuffle$trans1)
+df_origin$trans1 <- as.numeric(df_origin$trans1)
 df_shuffle <- filter(df_shuffle,!is.na(trans1))
 df_origin <- filter(df_origin,!is.na(trans1))
 
-df_shuffle_2 <- data_summary_med(df_shuffle,'trans1','No_sample')
-df_origin_2 <- data_summary_med(df_origin,'trans1','No_sample') 
-df_origin[6414,]$trans1 == '#NULL!' #Returns TRUE
-#STOPPEDHERE!!! Need to drop Null values. 
 
-No_Sample_Name = 'WTP4'
+df_origin_2 <- df_origin[df_origin$No_sample=='WTP4',]
+df_origin_2_clustred <- df_origin_2[df_origin_2$Type=='Clustred',]
+df_origin_2_Isolated <- df_origin_2[df_origin_2$Type=='Isolated',]
+df_origin_2_clustred_2 <- data_summary(df_origin_2_clustred,'trans1','Sample')
+df_origin_2_Isolated_2 <- data_summary(df_origin_2_Isolated,'trans1','Sample')
+#df_origin_3 <- data_summary_med(df_origin_2,'trans1','Sample')
+df_shuffle_2 <- df_shuffle[df_shuffle$No_sample=='WTP4',]
+df_shuffle_2_clustred <- df_shuffle_2[df_shuffle_2$Type=='Clustred',]
+df_shuffle_2_Isolated <- df_shuffle_2[df_shuffle_2$Type=='Isolated',]
+df_shuffle_2_clustred_2 <- data_summary(df_shuffle_2_clustred,'trans1','Sample')
+df_shuffle_2_Isolated_2 <- data_summary(df_shuffle_2_Isolated,'trans1','Sample')
+
 
 df_2 <- df[df$No_sample == No_Sample_Name,]
 df_2_Clu <- df_2[df_2$Type == 'Clustred',]
