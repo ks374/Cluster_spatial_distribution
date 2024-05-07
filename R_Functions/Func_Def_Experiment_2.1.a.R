@@ -30,7 +30,7 @@ get_single_replicate_1vs10 <- function(df,x,yrange=c(0,0.61)){
   
   ggplot(data = df_2,aes(x=Type,y=Ratio)) + 
     geom_bar(stat='identity') +
-    geom_errorbar(aes(ymin=Ratio-Margin_error,ymax=Ratio+Margin_error),width = 0.5) + 
+    geom_errorbar(aes(ymin=Ratio-SE,ymax=Ratio+SE),width = 0.5) + 
     geom_point(data = df) + 
     coord_cartesian(ylim=yrange) + 
     scale_y_continuous(expand = c(0, 0)) +
@@ -115,6 +115,42 @@ get_figure_norm_clustering_effect <- function (df,outpath,yrange=c(0,16.0)){
   name_string <- substring(name_string,4)
   ggsave(path = outpath,filename=paste(name_string,".eps",sep=""))
   ggsave(path = outpath,filename=paste(name_string,".png",sep=""))
+}
+barandpoints_3v3_plot <- function(filename,out_path,Sel_genotype,yrange){
+  df <- read.csv(filename)
+  df$Ratio <- as.numeric(df$Ratio)
+  df <- df[df$Genotype==Sel_genotype,]
+  df_Orig <- df[df$Type == 'Orig',]
+  df_Orig <- subset(df_Orig,select=-c(Index))
+  df_Rand <- df[df$Type == 'Rand',]
+  df_Rand_2 <- data_summary(df_Rand,"Ratio","Name")
+  df_Rand_2 <- subset(df_Rand_2, select = c(Name,Ratio))
+  df_Rand_2$No_sample <- substring(df_Rand_2$Name,1,4)
+  df_Rand_2$Genotype <- substring(df_Rand_2$Name,1,2)
+  df_Rand_2$Age <- substring(df_Rand_2$Name,3,4)
+  df_Rand_2$Sample <- substring(df_Rand_2$Name,6,6)
+  df_Rand_2$Type <- "Rand"
+  df <- rbind(df_Orig,df_Rand_2)
+  df_Rand_2$No_sample <- substring(df_Rand_2$Name,1,4)
+  df_Orig_2 <- data_summary(df_Orig,"Ratio","No_sample")
+  df_Rand_2 <- data_summary(df_Rand_2,"Ratio","No_sample")
+  df_Orig_2$Type <- "Orig"
+  df_Rand_2$Type <- "Rand"
+  df2 <- rbind(df_Orig_2,df_Rand_2)
+  df2$Age <- substring(df2$No_sample,3,4)
+  ggplot(data=df2,aes(x=Age,y=Ratio,fill=Type)) +
+    geom_bar(stat='identity',na.rm=TRUE,position=position_dodge(0.9)) +
+    geom_errorbar(aes(ymin=Ratio-Margin_error, ymax=Ratio+Margin_error), width=.3,position=position_dodge(0.9)) +
+    geom_point(data=df,na.rm=TRUE,position=position_dodge(0.9)) +
+    geom_line(data=df,aes(group=Name),na.rm=TRUE,position=position_dodge(0.9)) +
+    coord_cartesian(ylim=yrange) + scale_y_continuous(expand = c(0, 0)) +
+    theme_classic()
+  name_string <- strsplit(filename,"/")
+  name_string <- name_string[[1]]
+  name_string <- name_string[length(name_string)]
+  name_string <- paste(substring(name_string,1,5),"_",Sel_genotype,sep="")
+  ggsave(path = out_path,filename=paste(name_string,".eps",sep=""))
+  ggsave(path = out_path,filename=paste(name_string,".png",sep=""))
 }
 Experiment21a_ANOVA_single <- function(df,age){
   df_P <- df[df$Age == age,]
