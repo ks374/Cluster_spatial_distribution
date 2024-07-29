@@ -116,6 +116,28 @@ get_figure_norm_clustering_effect <- function (df,outpath,yrange=c(0,16.0)){
   ggsave(path = outpath,filename=paste(name_string,".eps",sep=""))
   ggsave(path = outpath,filename=paste(name_string,".png",sep=""))
 }
+get_figure_norm_clustering_effect_CI <- function (df,outpath,yrange=c(0,16.0)){
+  df_multi <- df[df$Type == 'multi',]
+  df_single <- df[df$Type == 'single',]
+  df_multi_2 <- data_summary(df_multi,'Ratio','Age')
+  df_multi_2$Type = 'multi'
+  df_single_2 <- data_summary(df_single,'Ratio','Age')
+  df_single_2$Type = 'single'
+  df_2 <- rbind(df_single_2,df_multi_2)
+  level_order <- c('P2','P4','P8')
+  ggplot(data=df_2,aes(x=factor(Age,level=level_order),y=Ratio)) +
+    geom_bar(aes(fill=Type),stat='identity',na.rm=TRUE,position=position_dodge(0.9)) + 
+    geom_errorbar(aes(ymin=Ratio-Margin_error, ymax=Ratio+Margin_error,group=Type), width=.6,position=position_dodge(0.9)) + 
+    geom_point(data=df,aes(fill=Type),position=position_dodge(width=0.9),size = 2) +
+    geom_line(data=df,aes(group=Name),position=position_dodge(width=0.9)) +
+    #scale_y_break(c(10,15)) +
+    coord_cartesian(ylim=yrange) + scale_y_continuous(expand = c(0, 0)) +
+    theme_classic()
+  name_string <- deparse(substitute(df))
+  name_string <- substring(name_string,4)
+  ggsave(path = outpath,filename=paste(name_string,".eps",sep=""))
+  ggsave(path = outpath,filename=paste(name_string,".png",sep=""))
+}
 barandpoints_3v3_plot <- function(filename,out_path,Sel_genotype,yrange){
   df <- read.csv(filename)
   df$Ratio <- as.numeric(df$Ratio)
