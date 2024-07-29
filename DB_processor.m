@@ -322,9 +322,10 @@ classdef DB_processor
             end
             %ratios = mean(ratios,2);
         end
-        function ratios_writer(obj,ratios,outfile)
+        function ratios_writer(obj,ratios,outfile,num_rand)
             %This function is specifically used to write ratios with 18*11
             %size, where the last 10 columns are randomized data. 
+            %num_rand: used when there is not 10 columns. 
             ratios = ratios(:);
             Sname_list = string(obj.Sample_name_list)';
             Sample_name_list_char = char(Sname_list);
@@ -336,7 +337,7 @@ classdef DB_processor
             type_2(1:18,1) = "Rand";
             headline = ["Name","No_sample","Genotype","Age","Sample","Type","Index","Ratio"];
             writematrix(headline,outfile,"WriteMode","append");
-            for i = 0:10
+            for i = 0:num_rand
                 ratio_temp = ratios((i*18+1):(i*18)+18);
                 Index_list(1:18,1) = i;
                 if i == 0
@@ -480,6 +481,8 @@ classdef DB_processor
         %in the manuscript. 
         %Generated randomzied data in:
         %Y:\Chenghang\4_Color_Continue\Database\Experiment_2.3\DBP_rand_10.mat.
+        %Important: experiment 7.1 and 7.2 require manually change multi to
+        %single. 
         function Is_clusterd_list = Is_clustered(obj,i,Is_CTB_pos,thre)
             %Check whethere there is single-AZ synaspe nearby. Return
             %whether the multi-AZ list is clustered or isolated. 
