@@ -3,20 +3,59 @@ library(ggplot2)
 library(ggdist)
 library(plyr)
 
-Fig2_plotter <- function(df,outfile){
+Fig2_plotter <- function(df,outpath,filename){
   df_pos <- df[df["CTB"]=='Pos',]
   df_neg <- df[df["CTB"]=='Neg',]
-  df_pos_2 <- data_summary(df_pos,B_Near_Comp,Age)
-  df_neg_2 <- data_summary(df_neg,B_Near_Comp,Age)
+  df_pos_2 <- data_summary(df_pos,'B_Near_Comp','Age')
+  df_neg_2 <- data_summary(df_neg,'B_Near_Comp','Age')
+  df_pos_2$CTB <- 'Pos'
+  df_neg_2$CTB <- 'Neg'
   df_2 <- rbind(df_pos_2,df_neg_2)
-  ggplot(data=df_2,aes(x=Age,y=B_Near_Comp,fill=CTB)) +
+  ggplot(data=df_2,aes(x=Age,y=B_Near_Comp,fill=factor(CTB,levels=c("Pos","Neg")))) +
     geom_bar(stat='identity',position=position_dodge(0.9)) +
-    #geom_errorbar(aes(ymin=Clustered_ratio-se,ymax=Clustered_ratio+se),width=.5,position=position_dodge(0.9)) +
-    #geom_point(data=df,position=position_dodge(0.9)) + 
-    #geom_line(data=df,aes(group=Name),position=position_dodge(0.9)) +
-    #coord_cartesian(ylim=c(0.0,1.0)) +
-    #scale_y_continuous(expand = c(0, 0)) +
-    #theme_classic()
+    geom_errorbar(aes(ymin=B_Near_Comp-se,ymax=B_Near_Comp+se),width=.5,position=position_dodge(0.9)) +
+    geom_point(data=df,position=position_dodge(0.9)) + 
+    geom_line(data=df,aes(group=Name),position=position_dodge(0.9)) +
+    coord_cartesian(ylim=c(2.0,3.0)) +
+    scale_y_continuous(expand = c(0,0)) +
+    theme_classic()
+  ggsave(path=outpath,filename=filename)
+}
+Fig2D_plotter <- function(df,outpath,filename,yscale){
+  df_pos <- df[df["CTB"]=='Pos',]
+  df_neg <- df[df["CTB"]=='Neg',]
+  df_pos_2 <- data_summary(df_pos,'Volume_um3','Index1')
+  df_neg_2 <- data_summary(df_neg,'Volume_um3','Index1')
+  df_pos_2$CTB <- 'Pos'
+  df_neg_2$CTB <- 'Neg'
+  df_2 <- rbind(df_pos_2,df_neg_2)
+  ggplot(data=df_2,aes(x=Index1,y=Volume_um3,fill=factor(CTB,levels=c("Pos","Neg")))) +
+    geom_bar(stat='identity',position=position_dodge(0.9)) +
+    geom_errorbar(aes(ymin=Volume_um3-se,ymax=Volume_um3+se),width=.5,position=position_dodge(0.9)) +
+    geom_point(data=df,position=position_dodge(0.9)) + 
+    geom_line(data=df,aes(group=paste(Name,Index1)),position=position_dodge(0.9)) +
+    coord_cartesian(ylim=yscale) +
+    scale_y_continuous(expand = c(0,0)) +
+    theme_classic()
+  ggsave(path=outpath,filename=filename)
+}
+Fig2E_plotter <- function(df,outpath,filename,yscale){
+  df_pos <- df[df["CTB"]=='Pos',]
+  df_neg <- df[df["CTB"]=='Neg',]
+  df_pos_2 <- data_summary(df_pos,'Ave_Size','Index1')
+  df_neg_2 <- data_summary(df_neg,'Ave_Size','Index1')
+  df_pos_2$CTB <- 'Pos'
+  df_neg_2$CTB <- 'Neg'
+  df_2 <- rbind(df_pos_2,df_neg_2)
+  ggplot(data=df_2,aes(x=Index1,y=Ave_Size,fill=factor(CTB,levels=c("Pos","Neg")))) +
+    geom_bar(stat='identity',position=position_dodge(0.9)) +
+    geom_errorbar(aes(ymin=Ave_Size-se,ymax=Ave_Size+se),width=.5,position=position_dodge(0.9)) +
+    geom_point(data=df,position=position_dodge(0.9)) + 
+    geom_line(data=df,aes(group=paste(Name,Index1)),position=position_dodge(0.9)) +
+    coord_cartesian(ylim=yscale) +
+    scale_y_continuous(expand = c(0,0)) +
+    theme_classic()
+  ggsave(path=outpath,filename=filename)
 }
   
 
@@ -25,18 +64,54 @@ Code_directory <- paste(project_directory,"Cluster_spatial_distribution/R_Functi
 setwd(Code_directory)
 source("./Func_Def_basics.R")
 
-base_folder <- paste(project_directory,"/First_submission_figure_data_stats/V7/All_figure_Statistics/",sep="")
+base_folder <- paste(project_directory,"First_submission_figure_data_stats/V7/All_figure_Statistics/",sep="")
 inpath <- paste(base_folder,"Fig. 2/",sep="")
-outpath <- paste(base_folder,"Data/Experiment_8/8_5_FigurewithDots/",sep="")
-
-
+outpath <- paste(project_directory,"Data/Experiment_8/8_5_FigurewithDots/",sep="")
 
 filename <- paste(inpath,"Fig. 2C.xlsx",sep="")
 df <- read_excel(filename)
 df_WT <- df[df['Genotype']=='WT',]
 df_B2 <- df[df['Genotype']=='B2',]
 
-outfile_WT1 <- paste(outpath,"Fig2CWT.eps",sep="")
-outfile_WT1 <- paste(outpath,"Fig2CWT.eps",sep="")
-outfile_WT1 <- paste(outpath,"Fig2CWT.eps",sep="")
-outfile_WT1 <- paste(outpath,"Fig2CWT.eps",sep="")
+Fig2_plotter(df_WT,outpath,"Fic2CWT.eps")
+Fig2_plotter(df_WT,outpath,"Fic2CWT.png")
+Fig2_plotter(df_B2,outpath,"Fic2CB2.eps")
+Fig2_plotter(df_B2,outpath,"Fic2CB2.png")
+
+#Fig2DE and supplemental: 
+filename <- paste(inpath,"Fig. 2DE.xlsx",sep="")
+df <- read_excel(filename)
+df_WTP2 <- df[df['No_Sample']=='WTP2',]
+df_WTP4 <- df[df['No_Sample']=='WTP4',]
+df_WTP8 <- df[df['No_Sample']=='WTP8',]
+df_B2P2 <- df[df['No_Sample']=='B2P2',]
+df_B2P4 <- df[df['No_Sample']=='B2P4',]
+df_B2P8 <- df[df['No_Sample']=='B2P8',]
+Fig2D_plotter(df_WTP4,outpath,"Fig2D_WTP4.eps",c(0,0.15))
+Fig2D_plotter(df_WTP4,outpath,"Fig2D_WTP4.png",c(0,0.15))
+Fig2E_plotter(df_WTP4,outpath,"Fig2E_WTP4.eps",c(0,0.04))
+Fig2E_plotter(df_WTP4,outpath,"Fig2E_WTP4.png",c(0,0.04))
+Fig2D_plotter(df_B2P4,outpath,"Fig2D_B2P4.eps",c(0,0.15))
+Fig2D_plotter(df_B2P4,outpath,"Fig2D_B2P4.png",c(0,0.15))
+Fig2E_plotter(df_B2P4,outpath,"Fig2E_B2P4.eps",c(0,0.04))
+Fig2E_plotter(df_B2P4,outpath,"Fig2E_B2P4.png",c(0,0.04))
+
+Fig2D_plotter(df_WTP2,outpath,"FigS2A_WTP2.eps",c(0,0.15))
+Fig2D_plotter(df_WTP2,outpath,"FigS2A_WTP2.png",c(0,0.15))
+Fig2D_plotter(df_B2P2,outpath,"FigS2A_B2P2.eps",c(0,0.15))
+Fig2D_plotter(df_B2P2,outpath,"FigS2A_B2P2.png",c(0,0.15))
+
+Fig2D_plotter(df_WTP8,outpath,"FigS2B_WTP8.eps",c(0,0.4))
+Fig2D_plotter(df_WTP8,outpath,"FigS2B_WTP8.png",c(0,0.4))
+Fig2D_plotter(df_B2P8,outpath,"FigS2B_B2P8.eps",c(0,0.4))
+Fig2D_plotter(df_B2P8,outpath,"FigS2B_B2P8.png",c(0,0.4))
+
+Fig2E_plotter(df_WTP2,outpath,"FigS2C_WTP2.eps",c(0,0.09))
+Fig2E_plotter(df_WTP2,outpath,"FigS2C_WTP2.png",c(0,0.09))
+Fig2E_plotter(df_B2P2,outpath,"FigS2C_B2P2.eps",c(0,0.09))
+Fig2E_plotter(df_B2P2,outpath,"FigS2C_B2P2.png",c(0,0.09))
+
+Fig2E_plotter(df_WTP8,outpath,"FigS2D_WTP8.eps",c(0,0.09))
+Fig2E_plotter(df_WTP8,outpath,"FigS2D_WTP8.png",c(0,0.09))
+Fig2E_plotter(df_B2P8,outpath,"FigS2D_B2P8.eps",c(0,0.09))
+Fig2E_plotter(df_B2P8,outpath,"FigS2D_B2P8.png",c(0,0.09))
