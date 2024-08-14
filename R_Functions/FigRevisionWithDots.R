@@ -57,6 +57,25 @@ Fig2E_plotter <- function(df,outpath,filename,yscale){
     theme_classic()
   ggsave(path=outpath,filename=filename)
 }
+
+Fig1_plotter <- function(df,outpath,filename,yname,yscale){
+  df_pos <- df[df["CTB"]=='Pos',]
+  df_neg <- df[df["CTB"]=='Neg',]
+  df_pos_2 <- data_summary(df_pos,yname,'Age')
+  df_neg_2 <- data_summary(df_neg,yname,'Age')
+  df_pos_2$CTB <- 'Pos'
+  df_neg_2$CTB <- 'Neg'
+  df_2 <- rbind(df_pos_2,df_neg_2)
+  ggplot(data=df_2,aes(x=Age,y=!!sym(yname),fill=factor(CTB,levels=c("Pos","Neg")))) +
+    geom_bar(stat='identity',position=position_dodge(0.9)) +
+    geom_errorbar(aes(ymin=!!sym(yname)-se,ymax=!!sym(yname)+se),width=.5,position=position_dodge(0.9)) +
+    geom_point(data=df,position=position_dodge(0.9)) + 
+    geom_line(data=df,aes(group=Name),position=position_dodge(0.9)) +
+    coord_cartesian(ylim=yscale) +
+    scale_y_continuous(expand = c(0,0)) +
+    theme_classic()
+  ggsave(path=outpath,filename=filename)
+}
   
 
 project_directory <- "D:/Research/Projects/Project_17_4_color_continue/"
@@ -115,3 +134,28 @@ Fig2E_plotter(df_WTP8,outpath,"FigS2D_WTP8.eps",c(0,0.09))
 Fig2E_plotter(df_WTP8,outpath,"FigS2D_WTP8.png",c(0,0.09))
 Fig2E_plotter(df_B2P8,outpath,"FigS2D_B2P8.eps",c(0,0.09))
 Fig2E_plotter(df_B2P8,outpath,"FigS2D_B2P8.png",c(0,0.09))
+
+#Figure 1 and S1: 
+base_folder <- paste(project_directory,"First_submission_figure_data_stats/V7/All_figure_Statistics/",sep="")
+inpath <- paste(base_folder,"Fig. 1/",sep="")
+outpath <- paste(project_directory,"Data/Experiment_8/8_5_FigurewithDots/Fig.1/",sep="")
+
+filename <- paste(inpath,"Fig.1DEF.xlsx",sep="")
+df <- read_excel(filename)
+df_WT <- df[df['Genotype']=='WT',]
+df_B2 <- df[df['Genotype']=='B2',]
+
+Fig1_plotter(df_WT,outpath,'Fig.1D_WT.eps','Comp_V_Density',c(0,0.048))
+Fig1_plotter(df_WT,outpath,'Fig.1D_WT.png','Comp_V_Density',c(0,0.048))
+Fig1_plotter(df_B2,outpath,'Fig.1D_B2.eps','Comp_V_Density',c(0,0.048))
+Fig1_plotter(df_B2,outpath,'Fig.1D_B2.png','Comp_V_Density',c(0,0.048))
+
+Fig1_plotter(df_WT,outpath,'Fig.1E_WT.eps','Ratio_Comp_V',c(0,0.43))
+Fig1_plotter(df_WT,outpath,'Fig.1E_WT.png','Ratio_Comp_V',c(0,0.43))
+Fig1_plotter(df_B2,outpath,'Fig.1E_B2.eps','Ratio_Comp_V',c(0,0.43))
+Fig1_plotter(df_B2,outpath,'Fig.1E_B2.png','Ratio_Comp_V',c(0,0.43))
+
+Fig1_plotter(df_WT,outpath,'Fig.S1_WT.eps','Simp_V_Density',c(0,0.088))
+Fig1_plotter(df_WT,outpath,'Fig.S1_WT.png','Simp_V_Density',c(0,0.088))
+Fig1_plotter(df_B2,outpath,'Fig.S1_B2.eps','Simp_V_Density',c(0,0.088))
+Fig1_plotter(df_B2,outpath,'Fig.S1_B2.png','Simp_V_Density',c(0,0.088))
