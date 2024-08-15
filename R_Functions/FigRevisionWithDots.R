@@ -76,6 +76,25 @@ Fig1_plotter <- function(df,outpath,filename,yname,yscale){
     theme_classic()
   ggsave(path=outpath,filename=filename)
 }
+
+Fig3_plotter <- function(df,outpath,filename,yname,yscale){
+  df_orig <- df[df["Type"]=='Orig',]
+  df_rand <- df[df["Type"]=='Rand',]
+  df_orig_2 <- data_summary(df_orig,yname,'Age')
+  df_rand_2 <- data_summary(df_rand,yname,'Age')
+  df_orig_2$Type <- 'Orig'
+  df_rand_2$Type <- 'Rand'
+  df_2 <- rbind(df_orig_2,df_rand_2)
+  ggplot(data=df_2,aes(x=Age,y=!!sym(yname),fill=factor(Type,levels=c("Orig","Rand")))) +
+    geom_bar(stat='identity',position=position_dodge(0.9)) +
+    geom_errorbar(aes(ymin=!!sym(yname)-se,ymax=!!sym(yname)+se),width=.5,position=position_dodge(0.9)) +
+    geom_point(data=df,position=position_dodge(0.9)) + 
+    geom_line(data=df,aes(group=Name),position=position_dodge(0.9)) +
+    coord_cartesian(ylim=yscale) +
+    scale_y_continuous(expand = c(0,0)) +
+    theme_classic()
+  ggsave(path=outpath,filename=filename)
+}
   
 
 project_directory <- "D:/Research/Projects/Project_17_4_color_continue/"
@@ -159,3 +178,73 @@ Fig1_plotter(df_WT,outpath,'Fig.S1_WT.eps','Simp_V_Density',c(0,0.088))
 Fig1_plotter(df_WT,outpath,'Fig.S1_WT.png','Simp_V_Density',c(0,0.088))
 Fig1_plotter(df_B2,outpath,'Fig.S1_B2.eps','Simp_V_Density',c(0,0.088))
 Fig1_plotter(df_B2,outpath,'Fig.S1_B2.png','Simp_V_Density',c(0,0.088))
+
+#Fig. 3 and 3 plus
+base_folder <- paste(project_directory,"Archive/Archive_Data/CTB_specific/Fig. 3_Searching_radius/",sep="")
+outpath <- paste(project_directory,"Data/Experiment_8/8_5_FigurewithDots/Fig.3/",sep="")
+
+filename <- paste(base_folder,"Comp_Neg_simp_neg_1.0/Raw_Simp.xlsx",sep="")
+df <- read_excel(filename)
+df <- df[df$Genotype=='WT',]
+Fig3_plotter(df,outpath,'Neg_Neg_1.0.eps','Num_Simp_Near_Ratio',c(0,1))
+Fig3_plotter(df,outpath,'Neg_Neg_1.0.png','Num_Simp_Near_Ratio',c(0,1))
+
+filename <- paste(base_folder,"Comp_Neg_simp_neg_2.0/Raw_Simp.xlsx",sep="")
+df <- read_excel(filename)
+df <- df[df$Genotype=='WT',]
+Fig3_plotter(df,outpath,'Neg_Neg_2.0.eps','Num_Simp_Near_Ratio',c(0,1))
+Fig3_plotter(df,outpath,'Neg_Neg_2.0.png','Num_Simp_Near_Ratio',c(0,1))
+
+filename <- paste(base_folder,"Comp_Neg_simp_neg_3.0/Raw_Simp.xlsx",sep="")
+df <- read_excel(filename)
+df <- df[df$Genotype=='WT',]
+Fig3_plotter(df,outpath,'Neg_Neg_3.0.eps','Num_Simp_Near_Ratio',c(0,1))
+Fig3_plotter(df,outpath,'Neg_Neg_3.0.png','Num_Simp_Near_Ratio',c(0,1))
+
+filename <- paste(base_folder,"Comp_Neg_simp_neg_4.0/Raw_Simp.xlsx",sep="")
+df <- read_excel(filename)
+df <- df[df$Genotype=='WT',]
+Fig3_plotter(df,outpath,'Neg_Neg_4.0.eps','Num_Simp_Near_Ratio',c(0,1))
+Fig3_plotter(df,outpath,'Neg_Neg_4.0.png','Num_Simp_Near_Ratio',c(0,1))
+
+#Fig different CTB
+filename <- paste(base_folder,"Comp_neg_simp_pos_1.5/Raw_Simp.xlsx",sep="")
+df <- read_excel(filename)
+df <- df[df$Genotype=='WT',]
+Fig3_plotter(df,outpath,'Neg_Pos_1.5_WT.eps','Num_Simp_Near_Ratio',c(0,1))
+Fig3_plotter(df,outpath,'Neg_Pos_1.5_WT.png','Num_Simp_Near_Ratio',c(0,1))
+df <- read_excel(filename)
+df <- df[df$Genotype=='B2',]
+Fig3_plotter(df,outpath,'Neg_Pos_1.5_B2.eps','Num_Simp_Near_Ratio',c(0,1))
+Fig3_plotter(df,outpath,'Neg_Pos_1.5_B2.png','Num_Simp_Near_Ratio',c(0,1))
+filename <- paste(base_folder,"Comp_pos_simp_neg_1.5/Raw_Simp.xlsx",sep="")
+df <- read_excel(filename)
+df <- df[df$Genotype=='WT',]
+Fig3_plotter(df,outpath,'Pos_Neg_1.5_WT.eps','Num_Simp_Near_Ratio',c(0,1))
+Fig3_plotter(df,outpath,'Pos_Neg_1.5_WT.png','Num_Simp_Near_Ratio',c(0,1))
+df <- read_excel(filename)
+df <- df[df$Genotype=='B2',]
+Fig3_plotter(df,outpath,'Pos_Neg_1.5_B2.eps','Num_Simp_Near_Ratio',c(0,1))
+Fig3_plotter(df,outpath,'Pos_Neg_1.5_B2.png','Num_Simp_Near_Ratio',c(0,1))
+
+#Fig.3plus: 
+filename <- paste(project_directory,"Data/Experiment_8/8_3_CTBPos_SearchingRadius/Pos_multi_1.0.csv",sep="")
+df <- read.csv(filename)
+df <- df[df$Genotype=='WT',]
+Fig3_plotter(df,outpath,'Pos_Pos_1.0.eps','Ratio',c(0,1))
+Fig3_plotter(df,outpath,'Pos_Pos_1.0.png','Ratio',c(0,1))
+filename <- paste(project_directory,"Data/Experiment_8/8_3_CTBPos_SearchingRadius/Pos_multi_2.0.csv",sep="")
+df <- read.csv(filename)
+df <- df[df$Genotype=='WT',]
+Fig3_plotter(df,outpath,'Pos_Pos_2.0.eps','Ratio',c(0,1))
+Fig3_plotter(df,outpath,'Pos_Pos_2.0.png','Ratio',c(0,1))
+filename <- paste(project_directory,"Data/Experiment_8/8_3_CTBPos_SearchingRadius/Pos_multi_3.0.csv",sep="")
+df <- read.csv(filename)
+df <- df[df$Genotype=='WT',]
+Fig3_plotter(df,outpath,'Pos_Pos_3.0.eps','Ratio',c(0,1))
+Fig3_plotter(df,outpath,'Pos_Pos_3.0.png','Ratio',c(0,1))
+filename <- paste(project_directory,"Data/Experiment_8/8_3_CTBPos_SearchingRadius/Pos_multi_4.0.csv",sep="")
+df <- read.csv(filename)
+df <- df[df$Genotype=='WT',]
+Fig3_plotter(df,outpath,'Pos_Pos_4.0.eps','Ratio',c(0,1))
+Fig3_plotter(df,outpath,'Pos_Pos_4.0.png','Ratio',c(0,1))
