@@ -11,8 +11,7 @@ for i = 1:18
     Dist = DBP.Get_Dist_2_matrix_closest(array_A,array_A);
 end
 Clustered_index = Dist < 1.5;
-array_B = array_A(Clustered_index,:);
-array_C = array_A(~Clustered_index,:);
+array_B = arra
 outfile = [outpath,'Pos_Pos_single.csv'];
 writematrix(Dist',outfile,'WriteMode','append');
 disp('Done');
