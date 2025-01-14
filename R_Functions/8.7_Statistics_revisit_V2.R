@@ -5,7 +5,7 @@ library(plyr)
 library(openxlsx)
 
 setwd("E:/File/Work/2024/eLife manuscript/Cluster_spatial_distribution/R_Functions/")
-source("./8.6_Statistics_revisit.R")
+source("./8.6_stats_func.R")
 
 
 Comp_Type_at_each_Age_pairedT <- function(df,yname,groupname){
