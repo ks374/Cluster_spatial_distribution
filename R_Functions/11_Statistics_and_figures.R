@@ -20,17 +20,9 @@ Exp11_cumsum <- function(df1,df2,outpath,filename,xrange=c(0,15)){
   ggsave(path = outpath,filename=paste(filename,".png",sep=""))
 }
 
-Comp_CTB_at_each_Age_ANOVA <- function(df,yname,groupname){
-  df_P2 <- get_df_P2(df)
-  df_P4 <- get_df_P4(df)
-  df_P8 <- get_df_P8(df)
-  #
-  df_P2.aov <- aov(reformulate(groupname,yname),data=df_P2)
-  print(summary(df_P2.aov))
-  df_P4.aov <- aov(reformulate(groupname,yname),data=df_P4)
-  print(summary(df_P4.aov))
-  df_P8.aov <- aov(reformulate(groupname,yname),data=df_P8)
-  print(summary(df_P8.aov))
+Comp_CTB_at_each_Age_KS <- function(df1,df2){
+  ks.test(df1$Distance,df2$Distance)
+  print(result)
 }
 
 
@@ -67,3 +59,19 @@ Exp11_cumsum(df1_WT_P8,df2_WT_P8,project_directory,"WTP8")
 Exp11_cumsum(df1_B2_P2,df2_B2_P2,project_directory,"B2P2")
 Exp11_cumsum(df1_B2_P4,df2_B2_P4,project_directory,"B2P4")
 Exp11_cumsum(df1_B2_P8,df2_B2_P8,project_directory,"B2P8")
+
+statistics_outfile <- paste(project_directory,"statistics.txt",sep="")
+sink(file=statistics_outfile)
+print("WTP2")
+Comp_CTB_at_each_Age_KS(df1_WT_P2,df2_WT_P2)
+print("WTP4")
+Comp_CTB_at_each_Age_KS(df1_WT_P4,df2_WT_P4)
+print("WTP8")
+Comp_CTB_at_each_Age_KS(df1_WT_P8,df2_WT_P8)
+print("B2P2")
+Comp_CTB_at_each_Age_KS(df1_B2_P2,df2_B2_P2)
+print("B2P4")
+Comp_CTB_at_each_Age_KS(df1_B2_P4,df2_B2_P4)
+print("B2P8")
+Comp_CTB_at_each_Age_KS(df1_B2_P8,df2_B2_P8)
+sink(NULL)
