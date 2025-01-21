@@ -16,6 +16,8 @@ name_list_Neg = ["WTP2A_Neg","WTP2B_Neg","WTP2C_Neg","WTP4A_Neg","WTP4B_Neg","WT
     "WTP8A_Neg","WTP8B_Neg","WTP8C_Neg","B2P2A_Neg","B2P2B_Neg","B2P2C_Neg",...
     "B2P4A_Neg","B2P4B_Neg","B2P4C_Neg","B2P8A_Neg","B2P8B_Neg","B2P8C_Neg",...
     ];
+%%
+%Without random picker. 
 for i=1:18
     disp(i);
     name = char(name_list_Pos(i));
@@ -36,7 +38,37 @@ for i=1:18
 
     exp11_writer(outfile_neg,name,Dist);
 end
+%%
+%With random picker: 
+for i=1:18
+    disp(i);
+    name = char(name_list_Neg(i));
+    indata = DBP.Neg_multi_DB;
+    indata_2 = DBP.Neg_single_DB;
+    array_A = DBP.get_position_array(indata,i);
+    array_B = DBP.get_position_array(indata_2,i);
+    num_neg = size(array_B,1);
+    Dist = DBP.Get_Dist_2_matrix_closest(array_B,array_A);
+
+    exp11_writer(outfile_neg,name,Dist);
     
+    
+    name = char(name_list_Pos(i));
+    indata = DBP.Pos_multi_DB;
+    indata_2 = DBP.Pos_single_DB;
+    array_A = DBP.get_position_array(indata,i);
+    array_B = DBP.get_position_array(indata_2,i);
+    num_pos = size(array_B,1);
+    if num_pos > num_neg
+        sel = randperm(num_pos,num_neg);
+    else
+        sel = randi(num_pos,num_neg,1);
+    end
+    array_B = array_B(sel,:);
+    Dist = DBP.Get_Dist_2_matrix_closest(array_B,array_A);
+
+    exp11_writer(outfile_pos,name,Dist); 
+end
 
     
 %%
