@@ -7,7 +7,7 @@ outfile_pos = 'Y:\Chenghang\4_Color_Continue\Database\Experiment_11\Raw_pos.csv'
 outfile_neg = 'Y:\Chenghang\4_Color_Continue\Database\Experiment_11\Raw_neg.csv';
 exp11_head_writer(outfile_pos);
 exp11_head_writer(outfile_neg);
-%%
+%
 name_list_Pos = ["WTP2A_Pos","WTP2B_Pos","WTP2C_Pos","WTP4A_Pos","WTP4B_Pos","WTP4C_Pos",...
     "WTP8A_Pos","WTP8B_Pos","WTP8C_Pos","B2P2A_Pos","B2P2B_Pos","B2P2C_Pos",...
     "B2P4A_Pos","B2P4B_Pos","B2P4C_Pos","B2P8A_Pos","B2P8B_Pos","B2P8C_Pos",...
@@ -25,7 +25,7 @@ for i=1:18
     indata_2 = DBP.Pos_single_DB;
     array_A = DBP.get_position_array(indata,i);
     array_B = DBP.get_position_array(indata_2,i);
-    Dist = DBP.Get_Dist_2_matrix_closest(array_B,array_A);
+    Dist = DBP.Get_Dist_2_matrix_closest(array_A,array_B);
 
     exp11_writer(outfile_pos,name,Dist);
 
@@ -34,12 +34,12 @@ for i=1:18
     indata_2 = DBP.Neg_single_DB;
     array_A = DBP.get_position_array(indata,i);
     array_B = DBP.get_position_array(indata_2,i);
-    Dist = DBP.Get_Dist_2_matrix_closest(array_B,array_A);
+    Dist = DBP.Get_Dist_2_matrix_closest(array_A,array_B);
 
     exp11_writer(outfile_neg,name,Dist);
 end
 %%
-%With random picker: 
+%With random picker (normalize): 
 for i=1:18
     disp(i);
     name = char(name_list_Neg(i));
@@ -48,7 +48,7 @@ for i=1:18
     array_A = DBP.get_position_array(indata,i);
     array_B = DBP.get_position_array(indata_2,i);
     num_neg = size(array_B,1);
-    Dist = DBP.Get_Dist_2_matrix_closest(array_B,array_A);
+    Dist = DBP.Get_Dist_2_matrix_closest(array_A,array_B);
 
     exp11_writer(outfile_neg,name,Dist);
     
@@ -65,12 +65,44 @@ for i=1:18
         sel = randi(num_pos,num_neg,1);
     end
     array_B = array_B(sel,:);
-    Dist = DBP.Get_Dist_2_matrix_closest(array_B,array_A);
+    Dist = DBP.Get_Dist_2_matrix_closest(array_A,array_B);
 
     exp11_writer(outfile_pos,name,Dist); 
 end
+%%
+%Normalized, random synapse property assignment. 
+%
+for i=1:18
+    disp(i);
+    name = char(name_list_Neg(i));
+    indata = DBP.Neg_multi_DB;
+    indata_2 = DBP.Neg_single_DB;
+    array_A = DBP.get_position_array(indata,i);
+    array_B = DBP.get_position_array(indata_2,i);
+    num_neg = size(array_B,1);
+    [array_A_2,array_B_2] = exp11_property_shuffle(array_A,array_B);
+    Dist = DBP.Get_Dist_2_matrix_closest(array_A_2,array_B_2);
 
+    exp11_writer(outfile_neg,name,Dist);
     
+    
+    name = char(name_list_Pos(i));
+    indata = DBP.Pos_multi_DB;
+    indata_2 = DBP.Pos_single_DB;
+    array_A = DBP.get_position_array(indata,i);
+    array_B = DBP.get_position_array(indata_2,i);
+    num_pos = size(array_B,1);
+    if num_pos > num_neg
+        sel = randperm(num_pos,num_neg);
+    else
+        sel = randi(num_pos,num_neg,1);
+    end
+    array_B = array_B(sel,:);
+    [array_A_2,array_B_2] = exp11_property_shuffle(array_A,array_B);
+    Dist = DBP.Get_Dist_2_matrix_closest(array_A_2,array_B_2);
+
+    exp11_writer(outfile_pos,name,Dist); 
+end
 %%
 %Data writer: 
 function exp11_head_writer(outfile)
@@ -89,4 +121,10 @@ function exp11_writer(outfile,name,df)
         line = [name,No_sample,Genotype,Age,CTB,Sample,string(i),string(df(i))];
         writematrix(line,outfile,'WriteMode','append');
     end
+end
+function [array_A_2,array_B_2] = exp11_property_shuffle(array_A,array_B)
+    array_all = [array_A;array_B];
+    array_all(randperm(size(array_all,1)),:);
+    array_A_2 = array_all(1:size(array_A,1),:);
+    array_B_2 = array_all(size(array_A,1):end,:);
 end
