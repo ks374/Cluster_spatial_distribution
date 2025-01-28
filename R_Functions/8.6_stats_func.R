@@ -22,6 +22,14 @@ get_df_P4 <- function(df){
 get_df_P8 <- function(df){
   return(df[df$Age=="P8",])
 }
+
+get_df_Orig <- function(df){
+  return(df[df$Type=="Orig",])
+}
+get_df_Rand <- function(df){
+  return(df[df$Type=="Rand",])
+}
+
 #Calculation func
 Comp_CTB_at_each_Age_ANOVA <- function(df,yname,groupname){
   df_P2 <- get_df_P2(df)
