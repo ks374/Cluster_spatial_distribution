@@ -21,7 +21,7 @@ Exp11_cumsum <- function(df1,df2,outpath,filename,xrange=c(0,15)){
 }
 
 Comp_CTB_at_each_Age_KS <- function(df1,df2){
-  ks.test(df1$Distance,df2$Distance)
+  result <- ks.test(df1$Distance,df2$Distance)
   print(result)
 }
 
