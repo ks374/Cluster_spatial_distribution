@@ -3,13 +3,14 @@ library(pwr)
 library(plyr)
 library(openxlsx)
 
-setwd("D:/Research/Projects/Project_17_4_color_continue/Cluster_spatial_distribution/R_Functions/")
+#setwd("D:/Research/Projects/Project_17_4_color_continue/Cluster_spatial_distribution/R_Functions/")
+setwd("E:/File/Work/2024/eLife manuscript/Cluster_spatial_distribution/R_Functions/")
 source("./Func_Def_basics.R")
 source("./8.6_stats_func.R")
 source("./Func_Power_Test.R")
 
-project_directory <- "D:/Research/Projects/Project_17_4_color_continue/First_submission_figure_data_stats/V7_Contain_all_raw/All_figure_Statistics/"
-
+#project_directory <- "D:/Research/Projects/Project_17_4_color_continue/First_submission_figure_data_stats/V7_Contain_all_raw/All_figure_Statistics/"
+project_directory <- "E:/File/Work/2024/eLife manuscript/Data/"
 filename <- paste(project_directory,"Fig. 1/Fig.1DEF.xlsx",sep="")
 df <- read.xlsx(filename)
 
@@ -44,7 +45,22 @@ outfile <- outfile <- paste(project_directory,"Fig. 2/Fig.2E_S2_Power.txt",sep="
 Fig2_Comp_AZIndex(df,'Ave_Vol',outfile)
 
 #Fig. 3B and C
-#Pass, no data on Dell machine. 
+filename <- paste(project_directory,"Experiment_10_Figure3_normalized/Raw_3_orig.xlsx",sep="")
+df <- read.xlsx(filename)
+df_Pos <- get_df_Pos(df)
+outfile <- paste(project_directory,"Experiment_10_Figure3_normalized/Fig.3_pos_orig_Power.txt",sep="")
+FigS3_Comp_Type(df_Pos,'Ratio',outfile)
+df_Neg <- get_df_Neg(df)
+outfile <- paste(project_directory,"Experiment_10_Figure3_normalized/Fig.3_neg_orig_Power.txt",sep="")
+FigS3_Comp_Type(df_Neg,'Ratio',outfile)
+filename <- paste(project_directory,"Experiment_10_Figure3_normalized/Raw_3_rand.xlsx",sep="")
+df <- read.xlsx(filename)
+df_Pos <- get_df_Pos(df)
+outfile <- paste(project_directory,"Experiment_10_Figure3_normalized/Fig.3_pos_rand_Power.txt",sep="")
+FigS3_Comp_Type(df_Pos,'Ratio',outfile)
+df_Neg <- get_df_Neg(df)
+outfile <- paste(project_directory,"Experiment_10_Figure3_normalized/Fig.3_neg_rand_Power.txt",sep="")
+FigS3_Comp_Type(df_Neg,'Ratio',outfile)
 
 #Fig. S3A
 filename <- paste(project_directory,"Fig. 3/Comp_Neg_simp_neg_1.0/Comp_neg_simp_neg_1.0.xlsx",sep="")
@@ -80,4 +96,14 @@ FigS3_Comp_Type(df,'Ratio',outfile)
 filename <- paste("D:/Research/Projects/Project_17_4_color_continue/Data/Experiment_8/8_3_CTBPos_SearchingRadius/Pos_multi_4.0.csv")
 df <- read.csv(filename)
 outfile <- "D:/Research/Projects/Project_17_4_color_continue/Data/Experiment_8/8_3_CTBPos_SearchingRadius/Fig. S3B_4.txt"
+FigS3_Comp_Type(df,'Ratio',outfile)
+
+#Fig.S3C
+filename <- paste(project_directory,"V7_Contain_all_raw/All_figure_Statistics/Fig. S_PosNeg_NegPos/Pos_Neg.xlsx",sep="")
+df <- read.xlsx(filename)
+outfile <- paste(project_directory,"V7_Contain_all_raw/All_figure_Statistics/Fig. S_PosNeg_NegPos/Pos_Neg.txt",sep="")
+FigS3_Comp_Type(df,'Ratio',outfile)
+filename <- paste(project_directory,"V7_Contain_all_raw/All_figure_Statistics/Fig. S_PosNeg_NegPos/Neg_Pos.xlsx",sep="")
+df <- read.xlsx(filename)
+outfile <- paste(project_directory,"V7_Contain_all_raw/All_figure_Statistics/Fig. S_PosNeg_NegPos/Neg_Pos.txt",sep="")
 FigS3_Comp_Type(df,'Ratio',outfile)
