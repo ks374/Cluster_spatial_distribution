@@ -1,8 +1,8 @@
 
 %% Experiment 11
 clear;clc
-base_folder = 'Y:\Chenghang\4_Color_Continue\';
-load([base_folder 'Database\DBP.mat']);
+base_folder = 'E:\File\Work\2024\eLife manuscript\';
+load([base_folder 'Data\V7_Contain_all_raw\DBP.mat']);
 outfile_pos = 'Y:\Chenghang\4_Color_Continue\Database\Experiment_11\Raw_pos.csv';
 outfile_neg = 'Y:\Chenghang\4_Color_Continue\Database\Experiment_11\Raw_neg.csv';
 exp11_head_writer(outfile_pos);

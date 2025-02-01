@@ -85,7 +85,7 @@ classdef DB_processor
             the_array = table2array(indata(Cur_ID,6:8));
         end
         function Dist_mat = Get_Dist_2_matrix(~,Matrix_A,Matrix_B)
-            %Get distance from matrix A to matrix B. 
+            %Get distance from matrix A to matrix B. A being the center. 
             Dist_mat = zeros(size(Matrix_A,1),10);
             for i = 1:size(Matrix_A,1)
                 dist = sqrt(((Matrix_B(:,1)-Matrix_A(i,1))*0.0155).^2 +...
