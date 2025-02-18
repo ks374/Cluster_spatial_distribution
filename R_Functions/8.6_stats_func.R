@@ -30,6 +30,13 @@ get_df_Rand <- function(df){
   return(df[df$Type=="Rand",])
 }
 
+get_df_iso <- function(df){
+  return(df[df$Type=="iso",])
+}
+get_df_clu <- function(df){
+  return(df[df$Type=="clu",])
+}
+
 #Calculation func
 Comp_CTB_at_each_Age_ANOVA <- function(df,yname,groupname){
   df_P2 <- get_df_P2(df)
