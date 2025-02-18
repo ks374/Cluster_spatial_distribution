@@ -91,6 +91,9 @@ classdef DB_processor
                 dist = sqrt(((Matrix_B(:,1)-Matrix_A(i,1))*0.0155).^2 +...
                         ((Matrix_B(:,2)-Matrix_A(i,2))*0.0155).^2 +...
                         ((Matrix_B(:,3)-Matrix_A(i,3))*0.07).^2);
+                if numel(dist) < 10
+                    dist = [dist,dist,dist,dist,dist,dist,dist,dist,dist,dist];
+                end
                 dist = sort(dist);
                 dist = dist(1:10);
                 Dist_mat(i,:) = dist;
