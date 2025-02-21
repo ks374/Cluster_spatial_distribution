@@ -6,6 +6,7 @@ library(openxlsx)
 setwd("D:/Research/Projects/Project_17_4_color_continue/Cluster_spatial_distribution/R_Functions/")
 source("./8.6_stats_func.R")
 source("./Func_Def_Cumsum_Utility.R")
+source("./Func_Def_basics.R")
 
 Exp13_cumsum <- function(df1,df2,outpath,filename,xrange=c(0,12)){
   df1_sort <- get_norm_cumsum(df1,"Distance")
@@ -17,6 +18,25 @@ Exp13_cumsum <- function(df1,df2,outpath,filename,xrange=c(0,12)){
     geom_line() +
     coord_cartesian(xlim=xrange,ylim=c(0,1)) +
     scale_y_continuous(expand = c(0, 0)) +
+    theme_classic()
+  ggsave(path = outpath,filename=paste(filename,".eps",sep=""))
+  ggsave(path = outpath,filename=paste(filename,".png",sep=""))
+}
+
+Exp13_violin <- function(df1,df2,outpath,filename){
+  df1_sum <- data_summary(df1,'Distance','Name')
+  df2_sum <- data_summary(df2,'Distance','Name')
+  df1_sum$Type <- 'clu'
+  df2_sum$Type <- 'iso'
+  df <- rbind(df1,df2)
+  df_sum <- rbind(df1_sum,df2_sum)
+  df_sum$Sample <- substring(df_sum$Name,5,5)
+  ggplot() + 
+    geom_violin(data=df,aes(x=Type,y=Distance),na.rm=TRUE) +
+    geom_point(data=df_sum,aes(x=Type,y=Distance),na.rm=TRUE) +
+    geom_line(data=df_sum,aes(x=Type,y=Distance,group=Sample)) +
+    #coord_cartesian(ylim=c(0,1)) +
+    #scale_y_continuous() +
     theme_classic()
   ggsave(path = outpath,filename=paste(filename,".eps",sep=""))
   ggsave(path = outpath,filename=paste(filename,".png",sep=""))
@@ -52,9 +72,17 @@ df <- df[df['CTB'] == 'Neg_Pos',]
   df_B2_P8_iso <- get_df_iso(df_B2_P8)
 }
 
-Exp13_cumsum(df_WT_P2_clu,df_WT_P2_iso,project_directory,"WTP2")
-Exp13_cumsum(df_WT_P4_clu,df_WT_P4_iso,project_directory,"WTP4")
-Exp13_cumsum(df_WT_P8_clu,df_WT_P8_iso,project_directory,"WTP8")
-Exp13_cumsum(df_B2_P2_clu,df_B2_P2_iso,project_directory,"B2P2")
-Exp13_cumsum(df_B2_P4_clu,df_B2_P4_iso,project_directory,"B2P4")
-Exp13_cumsum(df_B2_P8_clu,df_B2_P8_iso,project_directory,"B2P8")
+#Exp13_cumsum(df_WT_P2_clu,df_WT_P2_iso,project_directory,"WTP2")
+#Exp13_cumsum(df_WT_P4_clu,df_WT_P4_iso,project_directory,"WTP4")
+#Exp13_cumsum(df_WT_P8_clu,df_WT_P8_iso,project_directory,"WTP8")
+#Exp13_cumsum(df_B2_P2_clu,df_B2_P2_iso,project_directory,"B2P2")
+#Exp13_cumsum(df_B2_P4_clu,df_B2_P4_iso,project_directory,"B2P4")
+#Exp13_cumsum(df_B2_P8_clu,df_B2_P8_iso,project_directory,"B2P8")
+
+
+Exp13_violin(df_WT_P2_clu,df_WT_P2_iso,project_directory,"WTP2")
+Exp13_violin(df_WT_P4_clu,df_WT_P4_iso,project_directory,"WTP4")
+Exp13_violin(df_WT_P8_clu,df_WT_P8_iso,project_directory,"WTP8")
+Exp13_violin(df_B2_P2_clu,df_B2_P2_iso,project_directory,"B2P2")
+Exp13_violin(df_B2_P4_clu,df_B2_P4_iso,project_directory,"B2P4")
+Exp13_violin(df_B2_P8_clu,df_B2_P8_iso,project_directory,"B2P8")
