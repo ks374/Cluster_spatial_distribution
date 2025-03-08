@@ -3,7 +3,7 @@ library(ggdist)
 library(plyr)
 library(openxlsx)
 
-setwd("D:/Research/Projects/Project_17_4_color_continue/Cluster_spatial_distribution/R_Functions/")
+setwd("E:/File/Work/2024/eLife manuscript/Cluster_spatial_distribution/R_Functions/")
 source("./8.6_stats_func.R")
 source("./Func_Def_Cumsum_Utility.R")
 source("./Func_Def_basics.R")
@@ -32,7 +32,7 @@ Exp13_violin <- function(df1,df2,outpath,filename){
   df_sum <- rbind(df1_sum,df2_sum)
   df_sum$Sample <- substring(df_sum$Name,5,5)
   ggplot() + 
-    geom_violin(data=df,aes(x=Type,y=Distance),na.rm=TRUE) +
+    geom_violin(data=df,aes(x=Type,y=Distance),na.rm=TRUE,draw_quantiles = c(0.25, 0.5, 0.75)) +
     geom_point(data=df_sum,aes(x=Type,y=Distance),na.rm=TRUE) +
     geom_line(data=df_sum,aes(x=Type,y=Distance,group=Sample)) +
     #coord_cartesian(ylim=c(0,1)) +
@@ -42,11 +42,11 @@ Exp13_violin <- function(df1,df2,outpath,filename){
   ggsave(path = outpath,filename=paste(filename,".png",sep=""))
 }
 
-project_directory <- "D:/Research/Projects/Project_17_4_color_continue/Data/Experiment_13/"
+project_directory <- "E:/File/Work/2024/eLife manuscript/Experiment_13_figure4_revisit/"
 filename <- paste(project_directory,"Exp13_all.csv",sep="")
 df <- read.csv(filename)
 
-df <- df[df['CTB'] == 'Neg_Pos',]
+df <- df[df['CTB'] == 'Neg_Neg',]
 #Data prep
 {
   #Data prep
