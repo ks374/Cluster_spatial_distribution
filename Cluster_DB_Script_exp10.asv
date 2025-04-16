@@ -5,22 +5,17 @@ load([base_folder 'DBP.mat']);
 outpath = 'E:\File\Work\2024\eLife manuscript\Data\Experiment_10_Figure3_normalized\Average_Number\';
 %%
 i=1;
-
-
-ratio = zeros(1,4);
 indata = DBP.Neg_multi_DB;
 indata_2 = DBP.Neg_single_DB;
 
     array_A = DBP.get_position_array(indata,i);
     array_B = DBP.get_position_array(indata_2,i);
-    Dist = DBP.Get_Dist_2_matrix_closest(array_B,array_A);
+    Dist = DBP.Get_Dist_2_matrix_closest(array_A,array_B);
     
-    Dist_2 = DBP.Get_Dist_2_matrix_closest(array_A,array_B);
-    numel_clustered = sum(Dist_2 < 1.5);
+    Dist_2 = DBP.Get_dist_2_matrix_closest(array_B,array_A);
+    numel_clustered = 
 
-ratio(1) = sum(Dist<1.5) / size(array_A,1);
-ratio(2) = sum(Dist<1.5) / numel_clustered ;
-%ratio_1 = sum(Dist<1.5) / size(array_A,1); %get the number of close sAZ divided by all multi
+ratio_1 = sum(Dist<1.5) / size(array_A,1); %get the number of close sAZ divided by all multi
 num_center = size(array_A,1);
 %
 %indata = DBP.Neg_multi_DB_rand;
@@ -40,12 +35,8 @@ indata = DBP.Neg_single_DB;
     array_B = array_A(sel,:);
 
     Dist = DBP.Get_Dist_2_matrix_closest(array_A,array_B);
-    Dist_2 = DBP.Get_Dist_2_matrix_closest(array_B,array_A);
-    numel_clustered = sum(Dist_2 < 1.5);
 
-ratio(3) = sum(Dist<1.5) / numel(sel);
-ratio(4) = sum(Dist<1.5) / numel_clustered ;
-disp(ratio);
+ratio_3 = sum(Dist<1.5) / numel(Dist)
 %
 %indata = DBP.Neg_single_DB_rand;
 

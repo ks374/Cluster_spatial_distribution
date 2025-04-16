@@ -19,7 +19,7 @@ Exp13_box <- function(df1,df2,outpath,filename){
   df_sum$Sample <- substring(df_sum$Name,5,5)
   ggplot() + 
     geom_boxplot(data=df,aes(x=Type,y=Distance),width=0.5,alpha=0.5,outlier.shape=NA,na.rm=TRUE) +
-    geom_quasirandom(data=df,aes(x=Type,y=Distance),size=1,alpha=0.7,width=0.2) +
+    geom_quasirandom(data=df,aes(x=Type,y=Distance),size=1,width=0.2) +
     scale_fill_brewer(palette = "Pastel1") +
     scale_color_brewer(palette = "Dark2") +
     geom_point(data=df_sum,aes(x=Type,y=Distance),size=5,na.rm=TRUE) +
@@ -36,7 +36,7 @@ project_directory <- "E:/File/Work/2024/eLife manuscript/Experiment_13_figure4_r
 filename <- paste(project_directory,"Exp13_all.csv",sep="")
 df <- read.csv(filename)
 
-df <- df[df['CTB'] == 'Pos_Pos',]
+df <- df[df['CTB'] == 'Neg_Neg',]
 #Data prep
 {
   #Data prep
