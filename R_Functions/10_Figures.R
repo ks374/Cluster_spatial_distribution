@@ -13,11 +13,11 @@ source("./Func_Def_Experiment_2.1.a.R")
 Exp10_plot <- function(df,project_directory,lim1,lim2,lim3){
   df <- get_rid_of_rand(df)
   df_P2 <- get_df_P2(df)
-  df_P2_2 <- data_summary(df_P2,'Ratio','Type')
+  df_P2_2 <- data_summary(df_P2,'Num_2_clu','Type')
   df_P4 <- get_df_P4(df)
-  df_P4_2 <- data_summary(df_P4,'Ratio','Type')
+  df_P4_2 <- data_summary(df_P4,'Num_2_clu','Type')
   df_P8 <- get_df_P8(df)
-  df_P8_2 <- data_summary(df_P8,'Ratio','Type')
+  df_P8_2 <- data_summary(df_P8,'Num_2_clu','Type')
   outpath <- project_directory
   
   Exp10_plot_core(df_P2_2,df_P2,outpath,lim1)
@@ -26,9 +26,9 @@ Exp10_plot <- function(df,project_directory,lim1,lim2,lim3){
 }
 
 Exp10_plot_core <- function(df_2,df,outpath,lim){
-  ggplot(data=df_2,aes(x=Type,y=Ratio)) + 
+  ggplot(data=df_2,aes(x=Type,y=Num_2_clu)) + 
     geom_bar(stat='identity') +
-    geom_errorbar(aes(ymin=Ratio-se,ymax=Ratio+se),width=.5) +
+    geom_errorbar(aes(ymin=Num_2_clu-se,ymax=Num_2_clu+se),width=.5) +
     geom_point(data=df) + 
     geom_line(data=df,aes(group=Name)) +
     coord_cartesian(ylim=lim) +
@@ -41,7 +41,7 @@ Exp10_plot_core <- function(df_2,df,outpath,lim){
 }
 
 #Data preparation
-filename <- paste(project_directory,"Raw_2.xlsx",sep="")
+filename <- paste(project_directory,"Raw_3.xlsx",sep="")
 df <- read.xlsx(filename)
 
 df_Pos <- get_df_Pos(df)
@@ -53,7 +53,7 @@ df_Pos_B2 <- get_df_B2(df_Pos)
 df_Neg_WT <- get_df_WT(df_Neg)
 df_Neg_B2 <- get_df_B2(df_Neg)
 
-Exp10_plot(df_Pos_WT,project_directory,c(0.2,0.61),c(0.2,0.61),c(0.2,0.61))
-Exp10_plot(df_Pos_B2,project_directory,c(0.2,0.61),c(0.2,0.61),c(0.2,0.61))
-Exp10_plot(df_Neg_WT,project_directory,c(0.2,0.61),c(0.2,0.61),c(0.2,0.61))
-Exp10_plot(df_Neg_B2,project_directory,c(0.2,0.61),c(0.2,0.61),c(0.2,0.61))
+Exp10_plot(df_Pos_WT,project_directory,c(0.0,3.01),c(0.0,3.01),c(0.0,3.01))
+Exp10_plot(df_Pos_B2,project_directory,c(0.0,3.01),c(0.0,3.01),c(0.0,3.01))
+Exp10_plot(df_Neg_WT,project_directory,c(0.0,3.01),c(0.0,3.01),c(0.0,3.01))
+Exp10_plot(df_Neg_B2,project_directory,c(0.0,3.01),c(0.0,3.01),c(0.0,3.01))

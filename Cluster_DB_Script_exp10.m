@@ -4,12 +4,13 @@ base_folder = 'E:\File\Work\2024\eLife manuscript\Data\V7_Contain_all_raw\';
 load([base_folder 'DBP.mat']);
 outpath = 'E:\File\Work\2024\eLife manuscript\Data\Experiment_10_Figure3_normalized\Average_Number\';
 %%
-i=1;
+%clc
+i=18;
 
 
 ratio = zeros(1,4);
-indata = DBP.Neg_multi_DB;
-indata_2 = DBP.Neg_single_DB;
+indata = DBP.Pos_multi_DB;
+indata_2 = DBP.Pos_single_DB;
 
     array_A = DBP.get_position_array(indata,i);
     array_B = DBP.get_position_array(indata_2,i);
@@ -32,7 +33,7 @@ num_center = size(array_A,1);
 
 %ratio_2 = sum(Dist<1.5) / numel(Dist);
 %
-indata = DBP.Neg_single_DB;
+indata = DBP.Pos_single_DB;
 
     array_A = DBP.get_position_array(indata,i);
     num_all = size(array_A,1);
