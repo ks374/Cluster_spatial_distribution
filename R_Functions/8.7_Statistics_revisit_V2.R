@@ -59,12 +59,12 @@ Comp_Type_at_each_Age_pairedT <- function(df,yname,groupname){
 {
 {
   project_directory <- "E:/File/Work/2024/eLife manuscript/Experiment_10_Figure3_normalized/"
-  filename <- paste(project_directory,"Raw_2.xlsx",sep="")
+  filename <- paste(project_directory,"Raw_3.xlsx",sep="")
   df <- read.xlsx(filename,sheet=1)
   df <- get_df_WT(df)
   df <- get_df_Pos(df)
-  df <- get_rid_of_rand(df)
-  yname <- "Ratio"
+  #df <- get_rid_of_rand(df)
+  yname <- "Num_2_clu"
   groupname <- "Type"
   outfile <- paste(project_directory,"3_WT_Pos.txt")
   sink(file=outfile)
@@ -73,42 +73,42 @@ Comp_Type_at_each_Age_pairedT <- function(df,yname,groupname){
 }
 {
   project_directory <- "E:/File/Work/2024/eLife manuscript/Experiment_10_Figure3_normalized/"
-  filename <- paste(project_directory,"Raw_2.xlsx",sep="")
+  filename <- paste(project_directory,"Raw_3.xlsx",sep="")
   df <- read.xlsx(filename,sheet=1)
   df <- get_df_B2(df)
   df <- get_df_Pos(df)
-  df <- get_rid_of_rand(df)
-  yname <- "Ratio"
+  #df <- get_rid_of_rand(df)
+  yname <- "Num_2_clu"
   groupname <- "Type"
-  outfile <- paste(project_directory,"3_B2_Pos.txt")
+  outfile <- paste(project_directory,"3D_B2_Pos.txt")
   sink(file=outfile)
   Comp_Type_at_each_Age_pairedT(df,yname,groupname)
   sink(NULL)
 }
 {
   project_directory <- "E:/File/Work/2024/eLife manuscript/Experiment_10_Figure3_normalized/"
-  filename <- paste(project_directory,"Raw_2.xlsx",sep="")
+  filename <- paste(project_directory,"Raw_3.xlsx",sep="")
   df <- read.xlsx(filename,sheet=1)
   df <- get_df_WT(df)
   df <- get_df_Neg(df)
-  df <- get_rid_of_rand(df)
-  yname <- "Ratio"
+  #df <- get_rid_of_rand(df)
+  yname <- "Num_2_clu"
   groupname <- "Type"
-  outfile <- paste(project_directory,"3_WT_Neg.txt")
+  outfile <- paste(project_directory,"3D_WT_Neg.txt")
   sink(file=outfile)
   Comp_Type_at_each_Age_pairedT(df,yname,groupname)
   sink(NULL)
 }
 {
   project_directory <- "E:/File/Work/2024/eLife manuscript/Experiment_10_Figure3_normalized/"
-  filename <- paste(project_directory,"Raw_2.xlsx",sep="")
+  filename <- paste(project_directory,"Raw_3.xlsx",sep="")
   df <- read.xlsx(filename,sheet=1)
   df <- get_df_B2(df)
   df <- get_df_Neg(df)
-  df <- get_rid_of_rand(df)
+  #df <- get_rid_of_rand(df)
   yname <- "Ratio"
   groupname <- "Type"
-  outfile <- paste(project_directory,"3_B2_Neg.txt")
+  outfile <- paste(project_directory,"3D_B2_Neg.txt")
   sink(file=outfile)
   Comp_Type_at_each_Age_pairedT(df,yname,groupname)
   sink(NULL)
